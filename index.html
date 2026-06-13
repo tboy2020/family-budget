@@ -829,20 +829,37 @@ const DEFAULT_EXPENSES = [
   "Affirm"
 ];
 
+function getPrevMonthData(year, month) {
+  // Get data from the immediately preceding month
+  let prevMonth = month - 1;
+  let prevYear = year;
+  if (prevMonth < 0) { prevMonth = 11; prevYear--; }
+  const raw = localStorage.getItem(storageKey(prevYear, prevMonth));
+  return raw ? JSON.parse(raw) : null;
+}
+
 function buildNewMonth(year, month) {
+  // 1. Try to copy from the previous month (amounts + descriptions)
+  const prev = getPrevMonthData(year, month);
+  if (prev) {
+    return {
+      income:   prev.income.filter(r=>r.desc).map(r=>({ id: uid(), desc: r.desc, amount: r.amount || '' })),
+      expenses: prev.expenses.filter(r=>r.desc).map(r=>({ id: uid(), desc: r.desc, amount: r.amount || '' })),
+      savings:  prev.savings.filter(r=>r.desc).map(r=>({ id: uid(), desc: r.desc, amount: r.amount || '' }))
+    };
+  }
+  // 2. Fall back to recurring template (desc only)
   const rec = getRecurring();
-  // If recurring expenses exist (user has saved before), use those
-  // Otherwise seed with the default expense list
   let expenses;
   if (rec.expenses.length) {
-    expenses = rec.expenses.map(r=>({ id: uid(), desc: r.desc, amount: '' }));
+    expenses = rec.expenses.map(r=>({ id: uid(), desc: r.desc, amount: r.amount || '' }));
   } else {
     expenses = DEFAULT_EXPENSES.map(desc=>({ id: uid(), desc, amount: '' }));
   }
   return {
-    income: rec.income.length ? rec.income.map(r=>({ id: uid(), desc: r.desc, amount: '' })) : [emptyRow()],
+    income:   rec.income.length ? rec.income.map(r=>({ id: uid(), desc: r.desc, amount: r.amount || '' })) : [emptyRow()],
     expenses,
-    savings: rec.savings.length ? rec.savings.map(r=>({ id: uid(), desc: r.desc, amount: '' })) : [emptyRow()]
+    savings:  rec.savings.length ? rec.savings.map(r=>({ id: uid(), desc: r.desc, amount: r.amount || '' })) : [emptyRow()]
   };
 }
 
@@ -853,7 +870,7 @@ function getRecurring() {
 
 function saveMonthData(year, month, data) {
   localStorage.setItem(storageKey(year, month), JSON.stringify(data));
-  // Carry over all rows with descriptions to next month
+  // Keep recurring template updated (desc + amount) for fallback
   const rec = {
     income:   data.income.filter(r=>r.desc),
     expenses: data.expenses.filter(r=>r.desc),
