@@ -552,6 +552,198 @@
   }
 
 
+
+  /* === PURCHASE FORM FIELDS === */
+  .field-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(74,28,110,0.55);
+    margin-bottom: 5px;
+  }
+  .field-select, .field-input {
+    width: 100%;
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px; color: var(--ink);
+    padding: 9px 12px;
+    border: 1.5px solid rgba(212,160,23,0.3);
+    border-radius: 8px;
+    background: var(--parchment);
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: auto;
+  }
+  .field-select:focus, .field-input:focus { border-color: var(--purple-mid); }
+  .submit-btn {
+    width: 100%;
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 12px;
+    border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #1A3A5E, #2D5A8E);
+    color: var(--gold-light);
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 3px 12px rgba(26,58,94,0.4);
+  }
+  .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+
+  /* === PURCHASE LIST ITEMS === */
+  .purchase-item {
+    display: flex; align-items: flex-start;
+    gap: 10px; padding: 10px 16px;
+    border-bottom: 1px solid rgba(212,160,23,0.1);
+    transition: background 0.15s;
+  }
+  .purchase-item:hover { background: rgba(212,160,23,0.04); }
+  .purchase-item:last-child { border-bottom: none; }
+  .purchase-store-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 0.06em;
+    background: linear-gradient(135deg, rgba(74,28,110,0.12), rgba(139,26,26,0.08));
+    color: var(--purple-mid);
+    padding: 3px 8px; border-radius: 20px;
+    white-space: nowrap; flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .purchase-info { flex: 1; min-width: 0; }
+  .purchase-desc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .purchase-meta {
+    font-family: 'Crimson Pro', serif;
+    font-size: 11px; font-style: italic;
+    color: rgba(74,28,110,0.45);
+    margin-top: 1px;
+  }
+  .purchase-amount {
+    font-family: 'Cinzel', serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--crimson-mid);
+    flex-shrink: 0;
+  }
+  .purchase-del {
+    background: none; border: none;
+    color: rgba(178,34,34,0.25); font-size: 15px;
+    cursor: pointer; flex-shrink: 0; padding: 0 2px;
+    transition: color 0.15s;
+  }
+  .purchase-del:hover { color: var(--crimson-mid); }
+
+  /* === CATEGORY TOTAL ROWS === */
+  .cat-row {
+    display: flex; align-items: center;
+    padding: 9px 16px;
+    border-bottom: 1px solid rgba(212,160,23,0.08);
+    gap: 10px;
+  }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-bar-wrap { flex: 1; height: 6px; background: rgba(212,160,23,0.12); border-radius: 10px; overflow: hidden; }
+  .cat-bar { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--purple-mid), var(--crimson-mid)); }
+  .cat-name {
+    font-family: 'Crimson Pro', serif;
+    font-size: 13px; color: var(--ink);
+    min-width: 120px;
+  }
+  .cat-amt {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--crimson-mid);
+    min-width: 70px; text-align: right;
+  }
+
+  /* === INSIGHTS === */
+  .insight-card {
+    background: rgba(251,246,236,0.96);
+    border-radius: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(212,160,23,0.2);
+    box-shadow: var(--shadow);
+  }
+  .insight-card-header {
+    padding: 12px 16px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--gold-light);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .insight-card-header.blue   { background: linear-gradient(135deg,#1A3A5E,#2D5A8E); }
+  .insight-card-header.red    { background: linear-gradient(135deg,#6B1A1A,#8B2222); }
+  .insight-card-header.purple { background: linear-gradient(135deg,#4A1C6E,#6B2D9E); }
+  .insight-card-header.green  { background: linear-gradient(135deg,#1A4A2E,#2D6B40); }
+
+  .top5-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(212,160,23,0.08);
+  }
+  .top5-row:last-child { border-bottom: none; }
+  .top5-rank {
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 900;
+    color: var(--gold-dim);
+    width: 20px; flex-shrink: 0; text-align: center;
+  }
+  .top5-info { flex: 1; min-width: 0; }
+  .top5-name {
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .top5-bar-wrap { height: 5px; background: rgba(212,160,23,0.12); border-radius: 10px; margin-top: 4px; overflow: hidden; }
+  .top5-bar { height: 100%; border-radius: 10px; }
+  .top5-right { text-align: right; flex-shrink: 0; }
+  .top5-amt {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--crimson-mid); display: block;
+  }
+  .top5-pct {
+    font-family: 'Crimson Pro', serif;
+    font-size: 11px; font-style: italic;
+    color: rgba(74,28,110,0.5);
+  }
+
+  .store-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px;
+    border-bottom: 1px solid rgba(212,160,23,0.08);
+  }
+  .store-row:last-child { border-bottom: none; }
+  .store-name {
+    font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--ink);
+    min-width: 90px;
+  }
+  .store-bar-wrap { flex:1; height:6px; background:rgba(212,160,23,0.1); border-radius:10px; overflow:hidden; }
+  .store-bar { height:100%; border-radius:10px; background: linear-gradient(90deg,#1A3A5E,#2D5A8E); }
+  .store-amt {
+    font-family:'Cinzel',serif; font-size:12px; font-weight:700;
+    color:#1A3A5E; min-width:65px; text-align:right;
+  }
+
+  .impact-badge {
+    display:inline-block;
+    font-family:'Cinzel',serif; font-size:9px; font-weight:700;
+    letter-spacing:0.08em;
+    padding:2px 8px; border-radius:20px;
+    background:rgba(178,34,34,0.1); color:var(--crimson-mid);
+    margin-left:6px;
+  }
+
+  .empty-state {
+    text-align:center; padding:30px 20px;
+    font-family:'Crimson Pro',serif; font-style:italic;
+    color:rgba(74,28,110,0.4); font-size:13px;
+  }
+  .empty-state .ei { font-size:28px; display:block; margin-bottom:8px; opacity:0.4; }
+
   /* === NAME PROMPT OVERLAY === */
   .name-overlay {
     position: fixed; inset: 0; z-index: 999;
@@ -627,7 +819,10 @@
 
   @media (max-width: 400px) {
     .summary-bar { grid-template-columns: repeat(2, 1fr); }
-    .nav-tab { font-size: 10px; padding: 9px 4px; }
+    .nav-tab { font-size: 9px; padding: 8px 3px; }
+  }
+  @media (max-width: 360px) {
+    .nav-tab { font-size: 8px; padding: 7px 2px; }
   }
 </style>
 </head>
@@ -663,8 +858,10 @@
 
   <!-- NAV TABS -->
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showTab('monthly')" id="tab-monthly">Monthly</button>
-    <button class="nav-tab" onclick="showTab('cumulative')" id="tab-cumulative">Cumulative</button>
+    <button class="nav-tab active" onclick="showTab('monthly')"    id="tab-monthly">Monthly</button>
+    <button class="nav-tab"        onclick="showTab('purchases')"  id="tab-purchases">Purchases</button>
+    <button class="nav-tab"        onclick="showTab('insights')"   id="tab-insights">Insights</button>
+    <button class="nav-tab"        onclick="showTab('cumulative')" id="tab-cumulative">Cumulative</button>
   </div>
 
   <!-- MONTH HEADER -->
@@ -785,6 +982,118 @@
     </div>
 
   </div><!-- /view-monthly -->
+
+  <!-- PURCHASES VIEW -->
+  <div id="view-purchases" style="display:none;">
+
+    <!-- MONTH NAV FOR PURCHASES -->
+    <div class="month-header">
+      <div class="month-nav">
+        <button onclick="changePurchaseMonth(-1)">&#8249;</button>
+        <div class="month-label" id="purchase-month-label">—</div>
+        <button onclick="changePurchaseMonth(1)">&#8250;</button>
+      </div>
+    </div>
+
+    <!-- ADD PURCHASE FORM -->
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#1A3A5E,#2D5A8E);">
+        <div class="card-header-title"><span class="icon">🛒</span> LOG A PURCHASE</div>
+        <div class="card-total" id="purchase-month-total">$0.00</div>
+      </div>
+      <div style="padding:16px 16px 8px;">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <!-- Store -->
+          <div>
+            <div class="field-label">Store / Platform</div>
+            <select class="field-select" id="p-store">
+              <option value="">Select store…</option>
+              <option>Kroger</option>
+              <option>Walmart</option>
+              <option>Amazon</option>
+              <option>Target</option>
+              <option>Costco</option>
+              <option>SHEIN</option>
+              <option>Temu</option>
+              <option>Sam's Club</option>
+              <option>Aldi</option>
+              <option>Dollar General</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <!-- Category -->
+          <div>
+            <div class="field-label">Category</div>
+            <select class="field-select" id="p-category">
+              <option value="">Select category…</option>
+              <option>Groceries</option>
+              <option>Clothing</option>
+              <option>Household</option>
+              <option>Electronics</option>
+              <option>Beauty &amp; Personal Care</option>
+              <option>Food &amp; Dining</option>
+              <option>Kids &amp; Baby</option>
+              <option>Health</option>
+              <option>Entertainment</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div style="margin-bottom:10px;">
+          <div class="field-label">Description (what did you buy?)</div>
+          <input class="field-input" id="p-desc" type="text" placeholder="e.g. Weekly groceries, Kids shoes…" maxlength="80">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <!-- Amount -->
+          <div>
+            <div class="field-label">Amount ($)</div>
+            <input class="field-input" id="p-amount" type="number" inputmode="decimal" placeholder="0.00">
+          </div>
+          <!-- Date -->
+          <div>
+            <div class="field-label">Date</div>
+            <input class="field-input" id="p-date" type="date">
+          </div>
+        </div>
+
+        <button class="submit-btn" onclick="addPurchase()">+ RECORD PURCHASE</button>
+      </div>
+    </div>
+
+    <!-- PURCHASE LIST -->
+    <div class="card" id="purchase-list-card">
+      <div class="card-header" style="background:linear-gradient(135deg,#2A1A5E,#1A3A6E);">
+        <div class="card-header-title"><span class="icon">📦</span> THIS MONTH'S PURCHASES</div>
+      </div>
+      <div id="purchase-list-body"></div>
+    </div>
+
+    <!-- CATEGORY TOTALS → feeds expenses -->
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#1A4A2E,#2D6B40);">
+        <div class="card-header-title"><span class="icon">📊</span> CATEGORY TOTALS</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:11px;font-style:italic;color:rgba(240,200,64,0.7);">auto-flows to expenses</div>
+      </div>
+      <div id="category-totals-body" style="padding:8px 0;"></div>
+    </div>
+
+  </div><!-- /view-purchases -->
+
+  <!-- INSIGHTS VIEW -->
+  <div id="view-insights" style="display:none;">
+    <div class="month-header">
+      <div class="month-nav">
+        <button onclick="changeInsightMonth(-1)">&#8249;</button>
+        <div class="month-label" id="insight-month-label">—</div>
+        <button onclick="changeInsightMonth(1)">&#8250;</button>
+      </div>
+    </div>
+    <div style="padding:0 12px;" id="insights-content"></div>
+  </div>
 
   <!-- CUMULATIVE VIEW -->
   <div id="view-cumulative" style="display:none;">
@@ -1058,12 +1367,14 @@ function changeMonth(delta) {
 // TABS
 // =====================================================
 function showTab(tab) {
-  document.getElementById('view-monthly').style.display = tab === 'monthly' ? '' : 'none';
-  document.getElementById('view-cumulative').style.display = tab === 'cumulative' ? '' : 'none';
-  document.getElementById('month-header-bar').style.display = tab === 'monthly' ? '' : 'none';
-  document.getElementById('tab-monthly').classList.toggle('active', tab==='monthly');
-  document.getElementById('tab-cumulative').classList.toggle('active', tab==='cumulative');
+  ['monthly','purchases','insights','cumulative'].forEach(t => {
+    document.getElementById('view-'+t).style.display = (t===tab) ? '' : 'none';
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+  });
+  document.getElementById('month-header-bar').style.display = tab==='monthly' ? '' : 'none';
   if (tab === 'cumulative') renderCumulative();
+  if (tab === 'purchases')  renderPurchases();
+  if (tab === 'insights')   renderInsights();
 }
 
 // =====================================================
@@ -1288,6 +1599,282 @@ function generateCallouts(summaries) {
 }
 
 
+
+// =====================================================
+// PURCHASE TRACKER
+// =====================================================
+const PURCHASE_STORES = ['Kroger','Walmart','Amazon','Target','Costco','SHEIN','Temu',"Sam's Club",'Aldi','Dollar General','Other'];
+const PURCHASE_CATS   = ['Groceries','Clothing','Household','Electronics','Beauty & Personal Care','Food & Dining','Kids & Baby','Health','Entertainment','Other'];
+const STORE_COLORS    = ['#2A6099','#0071CE','#FF9900','#CC0000','#E31837','#E8447A','#F46B2A','#007DC6','#00AEB3','#F6E61C','#6B2D9E'];
+
+let purchaseYear  = new Date().getFullYear();
+let purchaseMonth = new Date().getMonth();
+let insightYear   = new Date().getFullYear();
+let insightMonth  = new Date().getMonth();
+
+function purchaseKey(year, month) { return `purchases_v1_${year}_${month}`; }
+
+function getPurchases(year, month) {
+  const raw = localStorage.getItem(purchaseKey(year, month));
+  return raw ? JSON.parse(raw) : [];
+}
+
+function savePurchases(year, month, arr) {
+  localStorage.setItem(purchaseKey(year, month), JSON.stringify(arr));
+}
+
+function addPurchase() {
+  const store    = document.getElementById('p-store').value;
+  const category = document.getElementById('p-category').value;
+  const desc     = document.getElementById('p-desc').value.trim();
+  const amount   = parseFloat(document.getElementById('p-amount').value) || 0;
+  const date     = document.getElementById('p-date').value;
+
+  if (!store || !category || !desc || amount <= 0) {
+    // Highlight empty fields
+    ['p-store','p-category','p-desc','p-amount'].forEach(id => {
+      const el = document.getElementById(id);
+      const empty = !el.value || (id==='p-amount' && parseFloat(el.value)<=0);
+      el.style.borderColor = empty ? 'var(--crimson-mid)' : '';
+    });
+    return;
+  }
+
+  const purchases = getPurchases(purchaseYear, purchaseMonth);
+  purchases.push({ id: uid(), store, category, desc, amount, date: date || new Date().toISOString().slice(0,10) });
+  savePurchases(purchaseYear, purchaseMonth, purchases);
+
+  // Reset form
+  document.getElementById('p-store').value = '';
+  document.getElementById('p-category').value = '';
+  document.getElementById('p-desc').value = '';
+  document.getElementById('p-amount').value = '';
+  ['p-store','p-category','p-desc','p-amount'].forEach(id => document.getElementById(id).style.borderColor='');
+
+  renderPurchases();
+  syncPurchasesToExpenses(purchaseYear, purchaseMonth);
+}
+
+function deletePurchase(id) {
+  const purchases = getPurchases(purchaseYear, purchaseMonth).filter(p => p.id !== id);
+  savePurchases(purchaseYear, purchaseMonth, purchases);
+  renderPurchases();
+  syncPurchasesToExpenses(purchaseYear, purchaseMonth);
+}
+
+function syncPurchasesToExpenses(year, month) {
+  // Only sync if viewing the same month
+  if (year !== currentYear || month !== currentMonth) return;
+  const purchases = getPurchases(year, month);
+
+  // Sum by category
+  const catTotals = {};
+  purchases.forEach(p => {
+    catTotals[p.category] = (catTotals[p.category] || 0) + p.amount;
+  });
+
+  // In expenses, find rows labelled "Purchases: <Category>" and update or add
+  Object.entries(catTotals).forEach(([cat, total]) => {
+    const label = `Purchases: ${cat}`;
+    let row = data.expenses.find(r => r.desc === label);
+    if (row) {
+      row.amount = total.toFixed(2);
+    } else {
+      data.expenses.push({ id: uid(), desc: label, amount: total.toFixed(2) });
+    }
+  });
+
+  // Remove purchase rows whose category no longer has purchases
+  data.expenses = data.expenses.filter(r => {
+    if (!r.desc.startsWith('Purchases: ')) return true;
+    const cat = r.desc.replace('Purchases: ', '');
+    return catTotals[cat] !== undefined;
+  });
+
+  saveCurrentMonth();
+  renderRows('expense');
+  updateTotals();
+}
+
+function getCategoryTotals(purchases) {
+  const totals = {};
+  purchases.forEach(p => { totals[p.category] = (totals[p.category] || 0) + p.amount; });
+  return totals;
+}
+
+function getStoreTotals(purchases) {
+  const totals = {};
+  purchases.forEach(p => { totals[p.store] = (totals[p.store] || 0) + p.amount; });
+  return totals;
+}
+
+function renderPurchases() {
+  const purchases = getPurchases(purchaseYear, purchaseMonth);
+  const label = `${MONTHS[purchaseMonth]} ${purchaseYear}`;
+  document.getElementById('purchase-month-label').textContent = label;
+
+  const total = purchases.reduce((s,p)=>s+p.amount,0);
+  document.getElementById('purchase-month-total').textContent = fmt(total);
+
+  // List
+  const listBody = document.getElementById('purchase-list-body');
+  if (!purchases.length) {
+    listBody.innerHTML = '<div class="empty-state"><span class="ei">🛒</span>No purchases recorded yet this month.</div>';
+  } else {
+    const sorted = [...purchases].sort((a,b)=>b.date.localeCompare(a.date));
+    listBody.innerHTML = sorted.map(p => `
+      <div class="purchase-item">
+        <span class="purchase-store-badge">${escHtml(p.store)}</span>
+        <div class="purchase-info">
+          <div class="purchase-desc">${escHtml(p.desc)}</div>
+          <div class="purchase-meta">${escHtml(p.category)} · ${p.date}</div>
+        </div>
+        <span class="purchase-amount">${fmt(p.amount)}</span>
+        <button class="purchase-del" onclick="deletePurchase('${p.id}')">×</button>
+      </div>
+    `).join('');
+  }
+
+  // Category totals
+  const catTotals = getCategoryTotals(purchases);
+  const catBody = document.getElementById('category-totals-body');
+  const maxCat = Math.max(...Object.values(catTotals), 1);
+  if (!Object.keys(catTotals).length) {
+    catBody.innerHTML = '<div class="empty-state" style="padding:16px 16px;">No purchases to summarise yet.</div>';
+  } else {
+    catBody.innerHTML = Object.entries(catTotals)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([cat, amt]) => `
+        <div class="cat-row">
+          <span class="cat-name">${cat}</span>
+          <div class="cat-bar-wrap"><div class="cat-bar" style="width:${(amt/maxCat*100).toFixed(1)}%"></div></div>
+          <span class="cat-amt">${fmt(amt)}</span>
+        </div>
+      `).join('');
+  }
+}
+
+function changePurchaseMonth(delta) {
+  purchaseMonth += delta;
+  if (purchaseMonth > 11) { purchaseMonth = 0; purchaseYear++; }
+  if (purchaseMonth < 0)  { purchaseMonth = 11; purchaseYear--; }
+  renderPurchases();
+}
+
+// =====================================================
+// INSIGHTS TAB
+// =====================================================
+function changeInsightMonth(delta) {
+  insightMonth += delta;
+  if (insightMonth > 11) { insightMonth = 0; insightYear++; }
+  if (insightMonth < 0)  { insightMonth = 11; insightYear--; }
+  renderInsights();
+}
+
+function renderInsights() {
+  const label = `${MONTHS[insightMonth]} ${insightYear}`;
+  document.getElementById('insight-month-label').textContent = label;
+
+  const d   = getMonthData(insightYear, insightMonth);
+  const purchases = getPurchases(insightYear, insightMonth);
+  const totalIncome  = sumRows(d.income);
+  const tithe        = totalIncome * 0.1;
+  const totalExpense = sumRows(d.expenses);
+  const netIncome    = totalIncome - tithe - totalExpense;
+  const totalSavings = sumRows(d.savings);
+
+  let html = '';
+
+  // ── TOP 5 EXPENSE KILLERS ────────────────────────────────────────────────
+  const allExpenses = d.expenses.filter(r=>r.desc && parseFloat(r.amount)>0)
+    .map(r=>({ name: r.desc, amt: parseFloat(r.amount) }))
+    .sort((a,b)=>b.amt-a.amt)
+    .slice(0,5);
+
+  html += `<div class="insight-card">
+    <div class="insight-card-header red"><span>🔥</span> TOP 5 EXPENSE KILLERS</div>`;
+
+  if (!allExpenses.length) {
+    html += '<div class="empty-state"><span class="ei">📋</span>No expenses recorded yet.</div>';
+  } else {
+    const maxAmt = allExpenses[0].amt;
+    const barColors = ['#B22222','#CC3333','#D45050','#DC6060','#E07070'];
+    allExpenses.forEach((e,i) => {
+      const pctOfIncome  = totalIncome > 0 ? (e.amt/totalIncome*100).toFixed(1) : '—';
+      const pctOfExpense = totalExpense > 0 ? (e.amt/totalExpense*100).toFixed(1) : '—';
+      const barW = (e.amt/maxAmt*100).toFixed(1);
+      html += `<div class="top5-row">
+        <div class="top5-rank">#${i+1}</div>
+        <div class="top5-info">
+          <div class="top5-name">${escHtml(e.name)}</div>
+          <div class="top5-bar-wrap"><div class="top5-bar" style="width:${barW}%;background:${barColors[i]}"></div></div>
+        </div>
+        <div class="top5-right">
+          <span class="top5-amt">${fmt(e.amt)}</span>
+          <span class="top5-pct">${pctOfExpense}% of expenses · ${pctOfIncome}% of income</span>
+        </div>
+      </div>`;
+    });
+  }
+  html += '</div>';
+
+  // ── NET IMPACT SUMMARY ───────────────────────────────────────────────────
+  const topDrag = allExpenses.slice(0,5).reduce((s,e)=>s+e.amt,0);
+  const dragPct = totalIncome > 0 ? (topDrag/totalIncome*100).toFixed(1) : '0';
+  html += `<div class="insight-card">
+    <div class="insight-card-header purple"><span>⚖️</span> BOTTOM LINE IMPACT</div>
+    <div style="padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="text-align:center;padding:12px;background:rgba(178,34,34,0.07);border-radius:10px;">
+        <div style="font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:rgba(74,28,110,0.5);letter-spacing:0.1em;margin-bottom:4px;">TOP 5 DRAG</div>
+        <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:900;color:var(--crimson-mid);">${dragPct}%</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:11px;font-style:italic;color:rgba(74,28,110,0.45);">of gross income</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:rgba(26,107,60,0.07);border-radius:10px;">
+        <div style="font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:rgba(74,28,110,0.5);letter-spacing:0.1em;margin-bottom:4px;">NET INCOME</div>
+        <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:900;color:${netIncome>=0?'var(--success)':'var(--crimson-mid)'};">${fmt(netIncome)}</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:11px;font-style:italic;color:rgba(74,28,110,0.45);">after tithe &amp; expenses</div>
+      </div>
+    </div>
+  </div>`;
+
+  // ── PURCHASES BY STORE ───────────────────────────────────────────────────
+  const storeTotals = getStoreTotals(purchases);
+  const storeTotal  = purchases.reduce((s,p)=>s+p.amount,0);
+  html += `<div class="insight-card">
+    <div class="insight-card-header blue"><span>🛍️</span> PURCHASES BY STORE · ${fmt(storeTotal)}</div>`;
+  if (!purchases.length) {
+    html += '<div class="empty-state"><span class="ei">🛒</span>No purchases logged this month.</div>';
+  } else {
+    const maxStore = Math.max(...Object.values(storeTotals),1);
+    html += Object.entries(storeTotals).sort((a,b)=>b[1]-a[1]).map(([store,amt])=>`
+      <div class="store-row">
+        <span class="store-name">${store}</span>
+        <div class="store-bar-wrap"><div class="store-bar" style="width:${(amt/maxStore*100).toFixed(1)}%"></div></div>
+        <span class="store-amt">${fmt(amt)}</span>
+      </div>`).join('');
+  }
+  html += '</div>';
+
+  // ── PURCHASES BY CATEGORY ────────────────────────────────────────────────
+  const catTotals = getCategoryTotals(purchases);
+  html += `<div class="insight-card">
+    <div class="insight-card-header green"><span>📦</span> PURCHASES BY CATEGORY</div>`;
+  if (!purchases.length) {
+    html += '<div class="empty-state"><span class="ei">📦</span>No purchases logged this month.</div>';
+  } else {
+    const maxCat = Math.max(...Object.values(catTotals),1);
+    html += Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>`
+      <div class="cat-row">
+        <span class="cat-name">${cat}</span>
+        <div class="cat-bar-wrap"><div class="cat-bar" style="width:${(amt/maxCat*100).toFixed(1)}%"></div></div>
+        <span class="cat-amt">${fmt(amt)}</span>
+      </div>`).join('');
+  }
+  html += '</div>';
+
+  document.getElementById('insights-content').innerHTML = html;
+}
+
 // =====================================================
 // NAME MANAGEMENT
 // =====================================================
@@ -1333,13 +1920,17 @@ function checkAutoAdvance() {
   }
   const name = getUserName();
   if (!name) {
-    // Show name prompt overlay; loadCurrentMonth() called after name saved
     document.getElementById('name-overlay').style.display = 'flex';
     setTimeout(() => document.getElementById('name-input').focus(), 300);
   } else {
     applyName(name);
     loadCurrentMonth();
   }
+  // Set default date for purchase form to today
+  const todayStr = new Date().toISOString().slice(0,10);
+  document.getElementById('p-date').value = todayStr;
+  // Sync any existing purchases for current month into expenses
+  syncPurchasesToExpenses(currentYear, currentMonth);
 })();
 </script>
 </body>
