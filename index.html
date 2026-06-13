@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="My Budget">
+<title>Family Budget Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4A017;
+    --gold-light: #F0C840;
+    --gold-pale: #FDF3D0;
+    --gold-dim: #8B6914;
+    --purple: #4A1C6E;
+    --purple-mid: #6B2D9E;
+    --purple-light: #9B5EC7;
+    --purple-pale: #F0E6FA;
+    --crimson: #8B1A1A;
+    --crimson-mid: #B22222;
+    --crimson-light: #E05050;
+    --crimson-pale: #FDF0F0;
+    --ink: #1A0A2E;
+    --parchment: #FBF6EC;
+    --parchment-dark: #F0E8D5;
+    --white: #FFFFFF;
+    --success: #1A6B3C;
+    --success-pale: #E8F5EE;
+    --warning: #7A4500;
+    --warning-pale: #FFF3E0;
+    --shadow: 0 4px 24px rgba(74,28,110,0.15);
+    --shadow-lg: 0 8px 40px rgba(74,28,110,0.22);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    background: var(--ink);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === BACKGROUND === */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0;
+    background: linear-gradient(160deg, #1A0A2E 0%, #2D0D4E 40%, #4A1C1C 80%, #1A0A2E 100%);
+  }
+  .bg-layer::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(212,160,23,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 80% 70%, rgba(178,34,34,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(107,45,158,0.12) 0%, transparent 60%);
+  }
+  .bg-pattern {
+    position: absolute; inset: 0; opacity: 0.03;
+    background-image: repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 1px, transparent 0, transparent 50%);
+    background-size: 20px 20px;
+  }
+
+  /* === LAYOUT === */
+  .app-wrapper {
+    position: relative; z-index: 1;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 0 60px;
+  }
+
+  /* === HEADER === */
+  .app-header {
+    text-align: center;
+    padding: 32px 20px 24px;
+    position: relative;
+  }
+  .crown-icon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 0 8px rgba(212,160,23,0.6));
+    animation: glow 3s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { filter: drop-shadow(0 0 8px rgba(212,160,23,0.6)); }
+    50% { filter: drop-shadow(0 0 16px rgba(212,160,23,0.9)); }
+  }
+  .app-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(20px, 5vw, 28px);
+    font-weight: 900;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    text-shadow: 0 2px 12px rgba(212,160,23,0.4);
+  }
+  .app-subtitle {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: rgba(212,160,23,0.55);
+    letter-spacing: 0.15em;
+    margin-top: 2px;
+  }
+  .divider-ornament {
+    display: flex; align-items: center; gap: 10px;
+    margin: 12px auto 0;
+    max-width: 280px;
+    opacity: 0.5;
+  }
+  .divider-ornament::before, .divider-ornament::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .divider-ornament span { color: var(--gold); font-size: 12px; }
+
+  /* === NAV TABS === */
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 0 16px;
+    margin-bottom: 20px;
+    justify-content: center;
+  }
+  .nav-tab {
+    flex: 1; max-width: 160px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 10px 8px;
+    border: 1px solid rgba(212,160,23,0.25);
+    border-radius: 8px;
+    background: rgba(26,10,46,0.6);
+    color: rgba(212,160,23,0.6);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: center;
+  }
+  .nav-tab:hover { background: rgba(74,28,110,0.4); color: var(--gold-light); }
+  .nav-tab.active {
+    background: linear-gradient(135deg, rgba(74,28,110,0.8), rgba(139,26,26,0.6));
+    border-color: var(--gold);
+    color: var(--gold-light);
+    box-shadow: 0 2px 12px rgba(212,160,23,0.2);
+  }
+
+  /* === MONTH SELECTOR === */
+  .month-header {
+    text-align: center;
+    padding: 0 16px 16px;
+  }
+  .month-nav {
+    display: inline-flex; align-items: center; gap: 16px;
+    background: rgba(26,10,46,0.7);
+    border: 1px solid rgba(212,160,23,0.3);
+    border-radius: 50px;
+    padding: 8px 20px;
+  }
+  .month-nav button {
+    background: none; border: none;
+    color: var(--gold); font-size: 18px;
+    cursor: pointer; padding: 0 4px;
+    transition: all 0.2s;
+    line-height: 1;
+  }
+  .month-nav button:hover { color: var(--gold-light); transform: scale(1.2); }
+  .month-label {
+    font-family: 'Cinzel', serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.1em;
+    min-width: 160px; text-align: center;
+  }
+  .new-month-badge {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.1em;
+    background: var(--crimson-mid);
+    color: var(--gold-light);
+    padding: 2px 8px; border-radius: 20px;
+    margin-left: 8px;
+    animation: pulse 1.5s ease infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  /* === CARD === */
+  .card {
+    margin: 0 12px 16px;
+    background: rgba(251,246,236,0.96);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(212,160,23,0.2);
+    animation: slideUp 0.4s ease both;
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .card:nth-child(2) { animation-delay: 0.05s; }
+  .card:nth-child(3) { animation-delay: 0.10s; }
+  .card:nth-child(4) { animation-delay: 0.15s; }
+  .card:nth-child(5) { animation-delay: 0.20s; }
+  .card:nth-child(6) { animation-delay: 0.25s; }
+
+  .card-header {
+    padding: 14px 18px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-header-income { background: linear-gradient(135deg, #1A4A2E, #2D6B40); }
+  .card-header-tithe  { background: linear-gradient(135deg, #4A1C6E, #6B2D9E); }
+  .card-header-expense{ background: linear-gradient(135deg, #6B1A1A, #8B2222); }
+  .card-header-net    { background: linear-gradient(135deg, #1A3A6E, #2D5B9E); }
+  .card-header-savings{ background: linear-gradient(135deg, #4A3500, #8B6914); }
+
+  .card-header-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--gold-light);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-header-title .icon { font-size: 16px; }
+  .card-total {
+    font-family: 'Cinzel', serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--gold-light);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* === TABLE === */
+  .budget-table { width: 100%; border-collapse: collapse; }
+  .budget-table thead th {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.12em;
+    color: rgba(74,28,110,0.6);
+    padding: 8px 14px 6px;
+    border-bottom: 1px solid rgba(212,160,23,0.2);
+    text-align: left;
+    background: rgba(240,230,250,0.4);
+  }
+  .budget-table thead th:last-child { text-align: right; }
+  .budget-table tbody tr {
+    border-bottom: 1px solid rgba(212,160,23,0.1);
+    transition: background 0.15s;
+  }
+  .budget-table tbody tr:hover { background: rgba(212,160,23,0.05); }
+  .budget-table tbody td { padding: 8px 14px; vertical-align: middle; }
+
+  .row-num {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; font-weight: 600;
+    color: rgba(74,28,110,0.4);
+    width: 28px;
+  }
+  .input-desc {
+    width: 100%;
+    border: none; background: transparent;
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px; color: var(--ink);
+    padding: 3px 0;
+    outline: none;
+    border-bottom: 1px dashed rgba(212,160,23,0.3);
+    transition: border-color 0.2s;
+  }
+  .input-desc:focus { border-bottom-color: var(--purple-mid); }
+  .input-desc::placeholder { color: rgba(74,28,110,0.3); font-style: italic; }
+  .input-amount {
+    width: 100%;
+    border: none; background: transparent;
+    font-family: 'Crimson Pro', serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+    padding: 3px 0;
+    outline: none;
+    border-bottom: 1px dashed rgba(212,160,23,0.3);
+    transition: border-color 0.2s;
+  }
+  .input-amount:focus { border-bottom-color: var(--purple-mid); }
+  .input-amount::placeholder { color: rgba(74,28,110,0.3); font-style: italic; font-weight: 400; }
+  .amount-col { width: 100px; text-align: right; }
+  .action-col { width: 34px; text-align: center; }
+
+  .btn-delete {
+    background: none; border: none;
+    color: rgba(178,34,34,0.3);
+    font-size: 16px; cursor: pointer;
+    padding: 2px;
+    transition: color 0.2s, transform 0.15s;
+    line-height: 1;
+  }
+  .btn-delete:hover { color: var(--crimson-mid); transform: scale(1.2); }
+
+  .add-row-btn {
+    display: flex; align-items: center; gap: 6px;
+    margin: 8px 14px 12px;
+    background: none; border: none;
+    font-family: 'Crimson Pro', serif;
+    font-size: 13px; font-style: italic;
+    color: var(--purple-mid);
+    cursor: pointer; padding: 4px 0;
+    transition: color 0.2s;
+  }
+  .add-row-btn:hover { color: var(--gold-dim); }
+  .add-row-btn .plus { font-size: 17px; font-style: normal; font-weight: 600; }
+
+  /* === TITHE ROW === */
+  .tithe-row td {
+    background: rgba(155,94,199,0.07);
+    padding: 10px 14px;
+  }
+  .tithe-label {
+    font-family: 'Cinzel', serif;
+    font-size: 12px; font-weight: 700;
+    color: var(--purple-mid);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tithe-badge {
+    font-size: 9px;
+    background: rgba(107,45,158,0.15);
+    color: var(--purple-mid);
+    padding: 2px 7px; border-radius: 20px;
+    font-family: 'Crimson Pro', serif;
+    font-weight: 600; font-style: normal;
+    letter-spacing: 0.05em;
+  }
+  .tithe-amount {
+    font-family: 'Cinzel', serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--purple-mid);
+    text-align: right;
+  }
+
+  /* === NET INCOME === */
+  .net-card {
+    margin: 0 12px 16px;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    animation: slideUp 0.4s 0.3s ease both;
+  }
+  .net-positive { background: linear-gradient(135deg, #1A4A2E, #2D6B40); box-shadow: 0 4px 20px rgba(26,107,64,0.4); }
+  .net-negative { background: linear-gradient(135deg, #6B1A1A, #8B2222); box-shadow: 0 4px 20px rgba(139,34,34,0.4); }
+  .net-label {
+    font-family: 'Cinzel', serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--gold-light);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .net-value {
+    font-family: 'Cinzel', serif;
+    font-size: 22px; font-weight: 900;
+    color: var(--gold-light);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  /* === SUMMARY BAR === */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 12px;
+    margin-bottom: 16px;
+    animation: slideUp 0.4s 0.35s ease both;
+  }
+  .summary-pill {
+    background: rgba(26,10,46,0.75);
+    border: 1px solid rgba(212,160,23,0.2);
+    border-radius: 12px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .summary-pill-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.1em;
+    color: rgba(212,160,23,0.55);
+    display: block; margin-bottom: 4px;
+  }
+  .summary-pill-value {
+    font-family: 'Cinzel', serif;
+    font-size: 16px; font-weight: 700;
+    color: var(--gold-light);
+  }
+  .summary-pill-value.green { color: #6EE09B; }
+  .summary-pill-value.red   { color: #F07070; }
+
+  /* === CUMULATIVE VIEW === */
+  .cumulative-section { padding: 0 12px; }
+  .cumul-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cumul-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(212,160,23,0.4), transparent);
+  }
+
+  .cumul-table-wrap {
+    background: rgba(251,246,236,0.96);
+    border-radius: 14px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(212,160,23,0.2);
+    margin-bottom: 20px;
+  }
+  .cumul-table {
+    width: 100%; border-collapse: collapse;
+    min-width: 560px;
+  }
+  .cumul-table thead tr th {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(74,28,110,0.9), rgba(139,26,26,0.7));
+    color: var(--gold-light);
+    border-bottom: 2px solid rgba(212,160,23,0.4);
+    white-space: nowrap;
+    text-align: right;
+  }
+  .cumul-table thead tr th:first-child { text-align: left; }
+  .cumul-table tbody tr {
+    border-bottom: 1px solid rgba(212,160,23,0.1);
+    transition: background 0.15s;
+  }
+  .cumul-table tbody tr:hover { background: rgba(212,160,23,0.05); }
+  .cumul-table tbody td {
+    font-family: 'Crimson Pro', serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    text-align: right; color: var(--ink);
+    white-space: nowrap;
+  }
+  .cumul-table tbody td:first-child {
+    text-align: left;
+    font-family: 'Cinzel', serif;
+    font-size: 10px; font-weight: 700;
+    color: var(--purple-mid);
+    letter-spacing: 0.05em;
+  }
+  .cumul-table tfoot td {
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    padding: 10px 12px;
+    background: rgba(240,230,250,0.5);
+    border-top: 2px solid rgba(212,160,23,0.3);
+    color: var(--purple); text-align: right;
+  }
+  .cumul-table tfoot td:first-child { text-align: left; color: var(--purple-mid); }
+
+  .var-positive { color: var(--success); font-weight: 600; }
+  .var-negative { color: var(--crimson-mid); font-weight: 600; }
+  .var-neutral  { color: rgba(74,28,110,0.4); }
+
+  .callout-badge {
+    display: inline-block;
+    font-size: 9px; font-weight: 700;
+    padding: 2px 7px; border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em; margin-left: 4px;
+  }
+  .callout-up   { background: rgba(26,107,60,0.12); color: var(--success); }
+  .callout-down { background: rgba(178,34,34,0.12); color: var(--crimson-mid); }
+
+  /* Detail rows in cumulative */
+  .cumul-detail-row td:first-child {
+    font-family: 'Crimson Pro', serif;
+    font-size: 12px; font-style: italic;
+    color: var(--ink); opacity: 0.75;
+    padding-left: 24px; font-weight: 400;
+    letter-spacing: 0;
+  }
+  .cumul-section-header td {
+    background: rgba(212,160,23,0.07) !important;
+    font-family: 'Cinzel', serif !important;
+    font-size: 9px !important; font-weight: 700 !important;
+    color: var(--gold-dim) !important;
+    letter-spacing: 0.12em !important;
+    padding: 7px 12px !important;
+    text-align: left !important;
+    border-top: 1px solid rgba(212,160,23,0.2) !important;
+  }
+
+  /* === EMPTY STATE === */
+  .empty-cumul {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(251,246,236,0.96);
+    border-radius: 14px;
+    margin-bottom: 20px;
+  }
+  .empty-cumul .icon { font-size: 36px; opacity: 0.3; }
+  .empty-cumul p {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: rgba(74,28,110,0.5);
+    font-size: 14px; margin-top: 8px;
+  }
+
+  /* === RECURRING TOGGLE === */
+  .recurring-wrap {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px 10px;
+  }
+  .recurring-cb { accent-color: var(--purple-mid); width: 14px; height: 14px; cursor: pointer; }
+  .recurring-label {
+    font-family: 'Crimson Pro', serif;
+    font-size: 12px; font-style: italic;
+    color: rgba(74,28,110,0.55); cursor: pointer;
+  }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(212,160,23,0.3); border-radius: 10px; }
+
+  /* === MISC === */
+  .scripture-bar {
+    text-align: center;
+    padding: 8px 20px 20px;
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: rgba(212,160,23,0.35);
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 400px) {
+    .summary-bar { grid-template-columns: repeat(2, 1fr); }
+    .nav-tab { font-size: 10px; padding: 9px 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="bg-pattern"></div>
+</div>
+
+<div class="app-wrapper">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <span class="crown-icon">✦</span>
+    <div class="app-title">FAMILY BUDGET PLANNER</div>
+    <div class="app-subtitle">Stewardship · Provision · Purpose</div>
+    <div class="divider-ornament"><span>❧</span></div>
+  </div>
+
+  <!-- NAV TABS -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('monthly')" id="tab-monthly">Monthly</button>
+    <button class="nav-tab" onclick="showTab('cumulative')" id="tab-cumulative">Cumulative</button>
+  </div>
+
+  <!-- MONTH HEADER -->
+  <div class="month-header" id="month-header-bar">
+    <div class="month-nav">
+      <button onclick="changeMonth(-1)">&#8249;</button>
+      <div class="month-label" id="month-label">—</div>
+      <button onclick="changeMonth(1)">&#8250;</button>
+    </div>
+  </div>
+
+  <!-- MONTHLY VIEW -->
+  <div id="view-monthly">
+
+    <!-- INCOME -->
+    <div class="card" id="card-income">
+      <div class="card-header card-header-income">
+        <div class="card-header-title"><span class="icon">💰</span> INCOME</div>
+        <div class="card-total" id="total-income-header">$0.00</div>
+      </div>
+      <table class="budget-table">
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th>Description</th>
+            <th class="amount-col">Amount</th>
+            <th class="action-col"></th>
+          </tr>
+        </thead>
+        <tbody id="income-rows"></tbody>
+      </table>
+      <button class="add-row-btn" onclick="addRow('income')"><span class="plus">+</span> Add income source</button>
+    </div>
+
+    <!-- TITHE -->
+    <div class="card" id="card-tithe">
+      <div class="card-header card-header-tithe">
+        <div class="card-header-title"><span class="icon">🙏</span> TITHE</div>
+        <div class="card-total" id="tithe-header">$0.00</div>
+      </div>
+      <table class="budget-table">
+        <tbody>
+          <tr class="tithe-row">
+            <td colspan="2">
+              <div class="tithe-label">First Fruits Offering <span class="tithe-badge">10% of Income</span></div>
+              <div style="font-size:12px;color:rgba(107,45,158,0.55);font-style:italic;margin-top:3px;">Honour the LORD with your wealth — Prov. 3:9</div>
+            </td>
+            <td class="tithe-amount" id="tithe-amount">$0.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- EXPENSES -->
+    <div class="card" id="card-expenses">
+      <div class="card-header card-header-expense">
+        <div class="card-header-title"><span class="icon">📋</span> EXPENSES</div>
+        <div class="card-total" id="total-expense-header">$0.00</div>
+      </div>
+      <table class="budget-table">
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th>Description</th>
+            <th class="amount-col">Amount</th>
+            <th class="action-col"></th>
+          </tr>
+        </thead>
+        <tbody id="expense-rows"></tbody>
+      </table>
+      <button class="add-row-btn" onclick="addRow('expense')"><span class="plus">+</span> Add expense</button>
+    </div>
+
+    <!-- NET INCOME -->
+    <div class="net-card net-positive" id="net-card">
+      <div class="net-label"><span>⚖️</span> NET INCOME</div>
+      <div class="net-value" id="net-value">$0.00</div>
+    </div>
+
+    <!-- SAVINGS -->
+    <div class="card" id="card-savings">
+      <div class="card-header card-header-savings">
+        <div class="card-header-title"><span class="icon">🏦</span> SAVINGS</div>
+        <div class="card-total" id="total-savings-header">$0.00</div>
+      </div>
+      <table class="budget-table">
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th>Description / Goal</th>
+            <th class="amount-col">Amount</th>
+            <th class="action-col"></th>
+          </tr>
+        </thead>
+        <tbody id="savings-rows"></tbody>
+      </table>
+      <button class="add-row-btn" onclick="addRow('savings')"><span class="plus">+</span> Add savings goal</button>
+    </div>
+
+    <!-- SUMMARY BAR -->
+    <div class="summary-bar">
+      <div class="summary-pill">
+        <span class="summary-pill-label">AFTER SAVINGS</span>
+        <div class="summary-pill-value" id="after-savings-val">$0.00</div>
+      </div>
+      <div class="summary-pill">
+        <span class="summary-pill-label">SAVINGS RATE</span>
+        <div class="summary-pill-value" id="savings-rate-val">0%</div>
+      </div>
+      <div class="summary-pill">
+        <span class="summary-pill-label">TITHE GIVEN</span>
+        <div class="summary-pill-value" id="tithe-summ-val">$0.00</div>
+      </div>
+      <div class="summary-pill">
+        <span class="summary-pill-label">TOTAL EXPENSES</span>
+        <div class="summary-pill-value" id="expense-summ-val">$0.00</div>
+      </div>
+    </div>
+
+  </div><!-- /view-monthly -->
+
+  <!-- CUMULATIVE VIEW -->
+  <div id="view-cumulative" style="display:none;">
+    <div class="cumulative-section" id="cumul-content"></div>
+  </div>
+
+  <div class="scripture-bar">"For where your treasure is, there your heart will be also." — Matthew 6:21</div>
+
+</div><!-- /app-wrapper -->
+
+<script>
+// =====================================================
+// DATA LAYER
+// =====================================================
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function storageKey(year, month) { return `budget_v2_${year}_${month}`; }
+function recurringKey() { return 'budget_recurring_v2'; }
+
+function getMonthData(year, month) {
+  const raw = localStorage.getItem(storageKey(year, month));
+  if (raw) return JSON.parse(raw);
+  // Check if this is a new month → try to carry over recurring
+  return buildNewMonth(year, month);
+}
+
+const DEFAULT_EXPENSES = [
+  "Offerings",
+  "Mortgage",
+  "AEP Electric Bill",
+  "Columbia Gas",
+  "Spectrum Internet",
+  "T-Mobile",
+  "Car Insurance",
+  "Taiwo's Car Note",
+  "Vera's Car Note",
+  "Monthly Food Bill",
+  "Monthly Family Giving",
+  "Monthly Giving to Orphanage",
+  "Discover Credit Card",
+  "Discover Home Equity Loan",
+  "Affirm"
+];
+
+function buildNewMonth(year, month) {
+  const rec = getRecurring();
+  // If recurring expenses exist (user has saved before), use those
+  // Otherwise seed with the default expense list
+  let expenses;
+  if (rec.expenses.length) {
+    expenses = rec.expenses.map(r=>({ id: uid(), desc: r.desc, amount: '' }));
+  } else {
+    expenses = DEFAULT_EXPENSES.map(desc=>({ id: uid(), desc, amount: '' }));
+  }
+  return {
+    income: rec.income.length ? rec.income.map(r=>({ id: uid(), desc: r.desc, amount: '' })) : [emptyRow()],
+    expenses,
+    savings: rec.savings.length ? rec.savings.map(r=>({ id: uid(), desc: r.desc, amount: '' })) : [emptyRow()]
+  };
+}
+
+function getRecurring() {
+  const raw = localStorage.getItem(recurringKey());
+  return raw ? JSON.parse(raw) : {income:[], expenses:[], savings:[]};
+}
+
+function saveMonthData(year, month, data) {
+  localStorage.setItem(storageKey(year, month), JSON.stringify(data));
+  // Carry over all rows with descriptions to next month
+  const rec = {
+    income:   data.income.filter(r=>r.desc),
+    expenses: data.expenses.filter(r=>r.desc),
+    savings:  data.savings.filter(r=>r.desc)
+  };
+  localStorage.setItem(recurringKey(), JSON.stringify(rec));
+}
+
+function emptyRow() { return { id: uid(), desc: '', amount: '', recurring: false }; }
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+// =====================================================
+// STATE
+// =====================================================
+const today = new Date();
+let currentYear  = today.getFullYear();
+let currentMonth = today.getMonth(); // 0-indexed
+
+let data = {}; // current month data
+
+function loadCurrentMonth() {
+  data = getMonthData(currentYear, currentMonth);
+  renderAll();
+}
+
+function saveCurrentMonth() {
+  saveMonthData(currentYear, currentMonth, data);
+}
+
+// =====================================================
+// CALCULATIONS
+// =====================================================
+function sumRows(rows) {
+  return rows.reduce((s,r) => s + (parseFloat(r.amount)||0), 0);
+}
+function fmt(n) {
+  return '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtSigned(n) {
+  return (n < 0 ? '-' : '+') + fmt(n);
+}
+function calcAll() {
+  const totalIncome  = sumRows(data.income);
+  const tithe        = totalIncome * 0.1;
+  const totalExpense = sumRows(data.expenses);
+  const netIncome    = totalIncome - tithe - totalExpense;
+  const totalSavings = sumRows(data.savings);
+  const afterSavings = netIncome - totalSavings;
+  const savingsRate  = totalIncome > 0 ? (totalSavings / totalIncome * 100) : 0;
+  return { totalIncome, tithe, totalExpense, netIncome, totalSavings, afterSavings, savingsRate };
+}
+
+// =====================================================
+// RENDER
+// =====================================================
+function renderAll() {
+  updateMonthLabel();
+  renderRows('income');
+  renderRows('expense');
+  renderRows('savings');
+  updateTotals();
+}
+
+function updateMonthLabel() {
+  const label = document.getElementById('month-label');
+  const isCurrentMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth();
+  const isFuture = new Date(currentYear, currentMonth) > new Date(today.getFullYear(), today.getMonth());
+  let html = `${MONTHS[currentMonth]} ${currentYear}`;
+  if (isCurrentMonth) html += `<span class="new-month-badge">CURRENT</span>`;
+  label.innerHTML = html;
+}
+
+function renderRows(section) {
+  const tbodyId = section === 'expense' ? 'expense-rows' : section+'-rows';
+  const key = section === 'expense' ? 'expenses' : section;
+  const tbody = document.getElementById(tbodyId);
+  const rows = data[key];
+  const placeholder = section === 'income' ? 'e.g. Salary, Freelance…' : section === 'expense' ? 'e.g. Rent, Groceries…' : 'e.g. Emergency Fund…';
+
+  tbody.innerHTML = rows.map((row, i) => `
+    <tr data-section="${key}" data-id="${row.id}">
+      <td class="row-num">${i+1}</td>
+      <td>
+        <input class="input-desc" type="text" placeholder="${placeholder}" value="${escHtml(row.desc)}"
+          oninput="updateRowField('${key}','${row.id}','desc',this.value)"
+          onblur="saveCurrentMonth()">
+      </td>
+      <td class="amount-col">
+        <input class="input-amount" type="number" inputmode="decimal" placeholder="0.00" value="${row.amount||''}"
+          oninput="updateRowField('${key}','${row.id}','amount',this.value);updateTotals()"
+          onblur="saveCurrentMonth()">
+      </td>
+      <td class="action-col">
+        <button class="btn-delete" onclick="deleteRow('${key}','${row.id}')" title="Remove">×</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+function updateTotals() {
+  const c = calcAll();
+  document.getElementById('total-income-header').textContent = fmt(c.totalIncome);
+  document.getElementById('tithe-header').textContent = fmt(c.tithe);
+  document.getElementById('tithe-amount').textContent = fmt(c.tithe);
+  document.getElementById('total-expense-header').textContent = fmt(c.totalExpense);
+  document.getElementById('total-savings-header').textContent = fmt(c.totalSavings);
+
+  const netEl = document.getElementById('net-value');
+  const netCard = document.getElementById('net-card');
+  netEl.textContent = fmt(c.netIncome);
+  netCard.className = 'net-card ' + (c.netIncome >= 0 ? 'net-positive' : 'net-negative');
+
+  const afterEl = document.getElementById('after-savings-val');
+  afterEl.textContent = fmt(c.afterSavings);
+  afterEl.className = 'summary-pill-value ' + (c.afterSavings >= 0 ? 'green' : 'red');
+
+  document.getElementById('savings-rate-val').textContent = c.savingsRate.toFixed(1) + '%';
+  document.getElementById('tithe-summ-val').textContent = fmt(c.tithe);
+  document.getElementById('expense-summ-val').textContent = fmt(c.totalExpense);
+}
+
+// =====================================================
+// ROW ACTIONS
+// =====================================================
+function updateRowField(key, id, field, value) {
+  const row = data[key].find(r=>r.id===id);
+  if (row) row[field] = value;
+}
+
+function addRow(section) {
+  const key = section === 'expense' ? 'expenses' : section;
+  data[key].push(emptyRow());
+  renderRows(section);
+  saveCurrentMonth();
+  // focus last desc input
+  setTimeout(()=>{
+    const tbody = document.getElementById(section==='expense'?'expense-rows':section+'-rows');
+    const inputs = tbody.querySelectorAll('.input-desc');
+    if (inputs.length) inputs[inputs.length-1].focus();
+  },50);
+}
+
+function deleteRow(key, id) {
+  const section = key === 'expenses' ? 'expense' : key;
+  if (data[key].length === 1) { data[key] = [emptyRow()]; }
+  else { data[key] = data[key].filter(r=>r.id!==id); }
+  renderRows(section);
+  updateTotals();
+  saveCurrentMonth();
+}
+
+// =====================================================
+// MONTH NAVIGATION
+// =====================================================
+function changeMonth(delta) {
+  saveCurrentMonth();
+  currentMonth += delta;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+  loadCurrentMonth();
+}
+
+// =====================================================
+// TABS
+// =====================================================
+function showTab(tab) {
+  document.getElementById('view-monthly').style.display = tab === 'monthly' ? '' : 'none';
+  document.getElementById('view-cumulative').style.display = tab === 'cumulative' ? '' : 'none';
+  document.getElementById('month-header-bar').style.display = tab === 'monthly' ? '' : 'none';
+  document.getElementById('tab-monthly').classList.toggle('active', tab==='monthly');
+  document.getElementById('tab-cumulative').classList.toggle('active', tab==='cumulative');
+  if (tab === 'cumulative') renderCumulative();
+}
+
+// =====================================================
+// CUMULATIVE DASHBOARD
+// =====================================================
+function getAllSavedMonths() {
+  const months = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    const m = k.match(/^budget_v2_(\d{4})_(\d+)$/);
+    if (m) months.push({ year: parseInt(m[1]), month: parseInt(m[2]) });
+  }
+  months.sort((a,b)=> a.year!==b.year ? a.year-b.year : a.month-b.month);
+  return months;
+}
+
+function collectAllDescriptions(months) {
+  const incomeDescs = new Set(), expenseDescs = new Set(), savingsDescs = new Set();
+  months.forEach(({year,month})=>{
+    const d = getMonthData(year, month);
+    d.income.forEach(r=>{ if(r.desc) incomeDescs.add(r.desc); });
+    d.expenses.forEach(r=>{ if(r.desc) expenseDescs.add(r.desc); });
+    d.savings.forEach(r=>{ if(r.desc) savingsDescs.add(r.desc); });
+  });
+  return { incomeDescs:[...incomeDescs], expenseDescs:[...expenseDescs], savingsDescs:[...savingsDescs] };
+}
+
+function getAmountForDesc(rows, desc) {
+  const r = rows.find(x=>x.desc===desc);
+  return r ? (parseFloat(r.amount)||0) : null;
+}
+
+function variance(curr, prev) {
+  if (prev === null || curr === null) return null;
+  return curr - prev;
+}
+
+function renderCumulative() {
+  const container = document.getElementById('cumul-content');
+  const months = getAllSavedMonths();
+
+  if (months.length === 0) {
+    container.innerHTML = `<div class="empty-cumul"><div class="icon">📊</div><p>No months saved yet.<br>Enter data in the Monthly tab to begin.</p></div>`;
+    return;
+  }
+
+  // Gather all unique desc labels
+  const { incomeDescs, expenseDescs, savingsDescs } = collectAllDescriptions(months);
+
+  // Build per-month summaries
+  const summaries = months.map(({year,month})=>{
+    const d = getMonthData(year, month);
+    const totalIncome = sumRows(d.income);
+    const tithe = totalIncome * 0.1;
+    const totalExpense = sumRows(d.expenses);
+    const netIncome = totalIncome - tithe - totalExpense;
+    const totalSavings = sumRows(d.savings);
+    return { year, month, d, totalIncome, tithe, totalExpense, netIncome, totalSavings };
+  });
+
+  // ---- Build summary table ----
+  let html = '';
+
+  // TOP SUMMARY TABLE
+  html += `<div class="cumul-title">📅 Month-by-Month Summary</div>`;
+  html += `<div class="cumul-table-wrap"><table class="cumul-table">`;
+  html += `<thead><tr>
+    <th>CATEGORY</th>
+    ${summaries.map(s=>`<th>${MONTHS[s.month].slice(0,3).toUpperCase()}<br>${s.year}</th>`).join('')}
+    ${summaries.length > 1 ? '<th>TOTAL</th>' : ''}
+  </tr></thead><tbody>`;
+
+  // INCOME SECTION HEADER
+  html += `<tr class="cumul-section-header"><td colspan="${summaries.length + (summaries.length>1?2:1)}">INCOME</td></tr>`;
+  // Detail rows for each income desc
+  incomeDescs.forEach(desc=>{
+    const vals = summaries.map(s=>getAmountForDesc(s.d.income, desc));
+    html += buildDetailRow(desc, vals, summaries, false);
+  });
+  // Total income row
+  html += buildSummaryRow('Total Income', summaries.map(s=>s.totalIncome), summaries, 'green');
+
+  // TITHE
+  html += `<tr class="cumul-section-header"><td colspan="${summaries.length + (summaries.length>1?2:1)}">TITHE (10%)</td></tr>`;
+  html += buildSummaryRow('Tithe', summaries.map(s=>s.tithe), summaries, 'purple');
+
+  // EXPENSES
+  html += `<tr class="cumul-section-header"><td colspan="${summaries.length + (summaries.length>1?2:1)}">EXPENSES</td></tr>`;
+  expenseDescs.forEach(desc=>{
+    const vals = summaries.map(s=>getAmountForDesc(s.d.expenses, desc));
+    html += buildDetailRow(desc, vals, summaries, true);
+  });
+  html += buildSummaryRow('Total Expenses', summaries.map(s=>s.totalExpense), summaries, 'red');
+
+  // NET INCOME
+  html += `<tr class="cumul-section-header"><td colspan="${summaries.length + (summaries.length>1?2:1)}">NET INCOME</td></tr>`;
+  html += buildSummaryRow('Net Income', summaries.map(s=>s.netIncome), summaries, 'dynamic');
+
+  // SAVINGS
+  html += `<tr class="cumul-section-header"><td colspan="${summaries.length + (summaries.length>1?2:1)}">SAVINGS</td></tr>`;
+  savingsDescs.forEach(desc=>{
+    const vals = summaries.map(s=>getAmountForDesc(s.d.savings, desc));
+    html += buildDetailRow(desc, vals, summaries, false);
+  });
+  html += buildSummaryRow('Total Savings', summaries.map(s=>s.totalSavings), summaries, 'green');
+
+  html += `</tbody></table></div>`;
+
+  // CALLOUTS SECTION
+  const callouts = generateCallouts(summaries);
+  if (callouts.length) {
+    html += `<div class="cumul-title">🔔 Callouts & Insights</div>`;
+    html += `<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">`;
+    callouts.forEach(c=>{
+      const bg = c.type==='good' ? 'rgba(26,107,60,0.08)' : c.type==='warn' ? 'rgba(178,34,34,0.08)' : 'rgba(212,160,23,0.08)';
+      const border = c.type==='good' ? 'rgba(26,107,60,0.3)' : c.type==='warn' ? 'rgba(178,34,34,0.3)' : 'rgba(212,160,23,0.3)';
+      const icon = c.type==='good' ? '✅' : c.type==='warn' ? '⚠️' : 'ℹ️';
+      html += `<div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:12px 14px;">
+        <div style="font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--purple-mid);letter-spacing:0.08em;margin-bottom:4px;">${icon} ${c.title}</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:13px;color:var(--ink);">${c.body}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function buildDetailRow(desc, vals, summaries, isExpense) {
+  const hasMultiple = summaries.length > 1;
+  let cells = vals.map((v, i) => {
+    if (v === null) return `<td style="color:rgba(74,28,110,0.25);">—</td>`;
+    const prev = i > 0 ? vals[i-1] : null;
+    const vari = variance(v, prev);
+    let varHtml = '';
+    if (vari !== null && prev !== null) {
+      const dir = isExpense ? (vari > 0 ? 'down' : 'up') : (vari >= 0 ? 'up' : 'down');
+      const cls = dir === 'up' ? 'callout-up' : 'callout-down';
+      const arrow = vari > 0 ? '▲' : '▼';
+      if (Math.abs(vari) > 0.005) {
+        varHtml = `<span class="callout-badge ${cls}">${arrow}${fmt(Math.abs(vari))}</span>`;
+      }
+    }
+    return `<td>${fmt(v)}${varHtml}</td>`;
+  });
+  const total = vals.reduce((s,v)=>(v!==null?s+(v||0):s), 0);
+  return `<tr class="cumul-detail-row"><td>${desc}</td>${cells.join('')}${hasMultiple?`<td style="font-weight:600">${fmt(total)}</td>`:''}</tr>`;
+}
+
+function buildSummaryRow(label, vals, summaries, colorType) {
+  const hasMultiple = summaries.length > 1;
+  let cells = vals.map((v, i) => {
+    const prev = i > 0 ? vals[i-1] : null;
+    const vari = variance(v, prev);
+    let varHtml = '';
+    if (vari !== null && prev !== null && Math.abs(vari) > 0.005) {
+      const isGood = colorType === 'red' ? vari < 0 : vari >= 0;
+      const cls = isGood ? 'callout-up' : 'callout-down';
+      const arrow = vari > 0 ? '▲' : '▼';
+      varHtml = `<span class="callout-badge ${cls}">${arrow}${fmt(Math.abs(vari))}</span>`;
+    }
+    let color = '';
+    if (colorType === 'green') color = 'color:var(--success);';
+    if (colorType === 'red')   color = 'color:var(--crimson-mid);';
+    if (colorType === 'purple') color = 'color:var(--purple-mid);';
+    if (colorType === 'dynamic') color = v >= 0 ? 'color:var(--success);' : 'color:var(--crimson-mid);';
+    return `<td style="font-weight:700;${color}">${fmt(v)}${varHtml}</td>`;
+  });
+  const total = vals.reduce((s,v)=>s+v, 0);
+  let totColor = '';
+  if (colorType === 'green') totColor = 'color:var(--success);';
+  if (colorType === 'red')   totColor = 'color:var(--crimson-mid);';
+  if (colorType === 'purple') totColor = 'color:var(--purple-mid);';
+  if (colorType === 'dynamic') totColor = total >= 0 ? 'color:var(--success);' : 'color:var(--crimson-mid);';
+  return `<tr style="background:rgba(212,160,23,0.05)"><td style="font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--purple);">${label}</td>${cells.join('')}${hasMultiple?`<td style="font-weight:800;${totColor}">${fmt(total)}</td>`:''}</tr>`;
+}
+
+function generateCallouts(summaries) {
+  if (summaries.length < 2) return [];
+  const callouts = [];
+  const last = summaries[summaries.length-1];
+  const prev = summaries[summaries.length-2];
+  const lastLabel = `${MONTHS[last.month].slice(0,3)} ${last.year}`;
+  const prevLabel = `${MONTHS[prev.month].slice(0,3)} ${prev.year}`;
+
+  // Net income change
+  const netDiff = last.netIncome - prev.netIncome;
+  if (Math.abs(netDiff) > 1) {
+    callouts.push({
+      type: netDiff > 0 ? 'good' : 'warn',
+      title: `Net Income ${netDiff > 0 ? 'Improved' : 'Declined'}`,
+      body: `Net income ${netDiff > 0 ? 'increased' : 'decreased'} by <strong>${fmt(Math.abs(netDiff))}</strong> from ${prevLabel} to ${lastLabel}.`
+    });
+  }
+  // Expense spike
+  const expDiff = last.totalExpense - prev.totalExpense;
+  if (expDiff > 50) {
+    callouts.push({
+      type: 'warn',
+      title: 'Expense Increase',
+      body: `Expenses rose by <strong>${fmt(expDiff)}</strong> (${((expDiff/prev.totalExpense)*100).toFixed(1)}%) compared to ${prevLabel}. Review for any unplanned costs.`
+    });
+  } else if (expDiff < -50) {
+    callouts.push({
+      type: 'good',
+      title: 'Expenses Reduced',
+      body: `Expenses dropped by <strong>${fmt(Math.abs(expDiff))}</strong> compared to ${prevLabel}. Great stewardship!`
+    });
+  }
+  // Savings
+  const savDiff = last.totalSavings - prev.totalSavings;
+  if (savDiff > 0) {
+    callouts.push({ type: 'good', title: 'Savings Growing', body: `Savings increased by <strong>${fmt(savDiff)}</strong> from ${prevLabel}. Keep building that reserve!` });
+  } else if (savDiff < -50) {
+    callouts.push({ type: 'warn', title: 'Savings Dropped', body: `Savings decreased by <strong>${fmt(Math.abs(savDiff))}</strong> from ${prevLabel}. Consider reviewing your savings goals.` });
+  }
+  // Tithe consistency
+  if (last.tithe > 0 && prev.tithe > 0) {
+    callouts.push({ type: 'info', title: 'Tithe Consistency', body: `Tithe honour maintained — ${fmt(last.tithe)} in ${lastLabel} and ${fmt(prev.tithe)} in ${prevLabel}. Faithful stewardship!` });
+  }
+  return callouts;
+}
+
+// =====================================================
+// AUTO MONTH DETECTION
+// =====================================================
+function checkAutoAdvance() {
+  // If today is the 1st of the month and current stored "active" month is the previous month,
+  // the user should see the new month. We just default to current month on load.
+  const saved = localStorage.getItem('budget_active_month');
+  if (!saved) return;
+  const { y, m } = JSON.parse(saved);
+  const now = new Date();
+  // If stored month is in the past and today is 1st or beyond, stay on current month
+}
+
+// =====================================================
+// INIT
+// =====================================================
+(function init() {
+  // First-time load: if no data exists at all, ensure recurring is empty
+  // so buildNewMonth seeds from DEFAULT_EXPENSES
+  const hasAnyData = Object.keys(localStorage).some(k => k.startsWith('budget_v2_'));
+  if (!hasAnyData) {
+    localStorage.removeItem(recurringKey());
+  }
+  loadCurrentMonth();
+})();
+</script>
+</body>
+</html>
