@@ -1007,7 +1007,7 @@
           <!-- Store -->
           <div>
             <div class="field-label">Store / Platform</div>
-            <select class="field-select" id="p-store">
+            <select class="field-select" id="p-store" onchange="toggleCustomStore(this.value)">
               <option value="">Select store…</option>
               <option>Kroger</option>
               <option>Walmart</option>
@@ -1021,6 +1021,9 @@
               <option>Dollar General</option>
               <option>Other</option>
             </select>
+            <input class="field-input" id="p-store-custom" type="text"
+              placeholder="Enter store name…" maxlength="40"
+              style="display:none;margin-top:8px;">
           </div>
           <!-- Category -->
           <div>
@@ -1642,8 +1645,22 @@ function savePurchases(year, month, arr) {
   localStorage.setItem(purchaseKey(year, month), JSON.stringify(arr));
 }
 
+function toggleCustomStore(val) {
+  const customInput = document.getElementById('p-store-custom');
+  if (val === 'Other') {
+    customInput.style.display = '';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = '';
+  }
+}
+
 function addPurchase() {
-  const store    = document.getElementById('p-store').value;
+  const storeRaw  = document.getElementById('p-store').value;
+  const store     = storeRaw === 'Other'
+    ? (document.getElementById('p-store-custom').value.trim() || 'Other')
+    : storeRaw;
   const category = document.getElementById('p-category').value;
   const desc     = document.getElementById('p-desc').value.trim();
   const amount   = parseFloat(document.getElementById('p-amount').value) || 0;
@@ -1665,6 +1682,8 @@ function addPurchase() {
 
   // Reset form
   document.getElementById('p-store').value = '';
+  document.getElementById('p-store-custom').value = '';
+  document.getElementById('p-store-custom').style.display = 'none';
   document.getElementById('p-category').value = '';
   document.getElementById('p-desc').value = '';
   document.getElementById('p-amount').value = '';
