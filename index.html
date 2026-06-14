@@ -2026,18 +2026,37 @@ function renderInsights() {
   // ── NET IMPACT SUMMARY ───────────────────────────────────────────────────
   const topDrag = allExpenses.slice(0,5).reduce((s,e)=>s+e.amt,0);
   const dragPct = totalIncome > 0 ? (topDrag/totalIncome*100).toFixed(1) : '0';
+
+  // Net status logic
+  const isNetLoss    = netIncome < 0;
+  const isNetTight   = netIncome >= 0 && netIncome < 300; // positive but dangerously low
+  const netBg        = isNetLoss  ? 'rgba(178,34,34,0.12)' : isNetTight ? 'rgba(200,150,12,0.10)' : 'rgba(26,107,60,0.07)';
+  const netBorder    = isNetLoss  ? '2px solid #C0392B' : isNetTight ? '2px solid #C8960C' : '2px solid transparent';
+  const netColor     = isNetLoss  ? '#C0392B' : isNetTight ? '#8B6200' : 'var(--success)';
+  const netLabelTxt  = isNetLoss  ? '⚠️ NET LOSS' : isNetTight ? '⚠️ TIGHT MARGIN' : '✅ NET INCOME';
+  const netSubTxt    = isNetLoss  ? 'expenses exceed income' : isNetTight ? 'under $300 remaining' : 'after tithe &amp; expenses';
+  const headerCls    = isNetLoss  ? 'red' : isNetTight ? 'purple' : 'purple';
+
+  // Warning banner
+  const warningBanner = isNetLoss
+    ? `<div style="background:#C0392B;color:#fff;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-align:center;padding:7px;">⚠️ NET LOSS — EXPENSES EXCEED INCOME AFTER TITHE</div>`
+    : isNetTight
+    ? `<div style="background:#8B6200;color:#fff;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-align:center;padding:7px;">⚠️ TIGHT MARGIN — LESS THAN $300 REMAINING</div>`
+    : '';
+
   html += `<div class="insight-card">
-    <div class="insight-card-header purple"><span>⚖️</span> BOTTOM LINE IMPACT</div>
+    <div class="insight-card-header ${headerCls}"><span>⚖️</span> BOTTOM LINE IMPACT</div>
+    ${warningBanner}
     <div style="padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div style="text-align:center;padding:12px;background:rgba(178,34,34,0.07);border-radius:10px;">
+      <div style="text-align:center;padding:12px;background:rgba(178,34,34,0.08);border:2px solid rgba(178,34,34,0.2);border-radius:10px;">
         <div style="font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:rgba(74,28,110,0.5);letter-spacing:0.1em;margin-bottom:4px;">TOP 5 DRAG</div>
-        <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:900;color:var(--crimson-mid);">${dragPct}%</div>
-        <div style="font-family:'Crimson Pro',serif;font-size:11px;font-style:italic;color:rgba(74,28,110,0.45);">of gross income</div>
+        <div style="font-family:'Cinzel',serif;font-size:20px;font-weight:900;color:var(--crimson-mid);">${dragPct}%</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:11px;font-style:italic;color:rgba(74,28,110,0.5);">of gross income</div>
       </div>
-      <div style="text-align:center;padding:12px;background:rgba(26,107,60,0.07);border-radius:10px;">
-        <div style="font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:rgba(74,28,110,0.5);letter-spacing:0.1em;margin-bottom:4px;">NET INCOME</div>
-        <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:900;color:${netIncome>=0?'var(--success)':'var(--crimson-mid)'};">${fmt(netIncome)}</div>
-        <div style="font-family:'Crimson Pro',serif;font-size:11px;font-style:italic;color:rgba(74,28,110,0.45);">after tithe &amp; expenses</div>
+      <div style="text-align:center;padding:12px;background:${netBg};border:${netBorder};border-radius:10px;">
+        <div style="font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:rgba(74,28,110,0.5);letter-spacing:0.1em;margin-bottom:4px;">${netLabelTxt}</div>
+        <div style="font-family:'Cinzel',serif;font-size:20px;font-weight:900;color:${netColor};">${fmt(netIncome)}</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:11px;font-style:italic;color:rgba(74,28,110,0.5);">${netSubTxt}</div>
       </div>
     </div>
   </div>`;
