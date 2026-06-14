@@ -436,7 +436,7 @@
     white-space: nowrap;
     text-align: right;
   }
-  .cumul-table thead tr th:first-child { text-align: left; }
+  .cumul-table thead tr th:first-child { text-align: left; min-width: 110px; }
   .cumul-table tbody tr {
     border-bottom: 1px solid rgba(212,160,23,0.1);
     transition: background 0.15s;
@@ -445,7 +445,7 @@
   .cumul-table tbody td {
     font-family: 'Crimson Pro', serif;
     font-size: 13px;
-    padding: 9px 12px;
+    padding: 9px 8px;
     text-align: right; color: var(--ink);
     white-space: nowrap;
   }
@@ -454,7 +454,11 @@
     font-family: 'Cinzel', serif;
     font-size: 10px; font-weight: 700;
     color: var(--purple-mid);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
+    white-space: normal;
+    min-width: 110px;
+    max-width: 130px;
+    word-break: break-word;
   }
   .cumul-table tfoot td {
     font-family: 'Cinzel', serif;
@@ -484,9 +488,11 @@
   .cumul-detail-row td:first-child {
     font-family: 'Crimson Pro', serif;
     font-size: 12px; font-style: italic;
-    color: var(--ink); opacity: 0.75;
-    padding-left: 24px; font-weight: 400;
+    color: var(--ink); opacity: 0.85;
+    padding-left: 16px; font-weight: 400;
     letter-spacing: 0;
+    white-space: normal;
+    word-break: break-word;
   }
   .cumul-section-header td {
     background: rgba(212,160,23,0.07) !important;
@@ -1676,9 +1682,8 @@ function renderCumulative() {
       const border = c.type==='good' ? '#2D8A5E' : c.type==='warn' ? '#C0392B' : '#C8960C';
       const titleC = c.type==='good' ? '#1A5C38' : c.type==='warn' ? '#8B1A1A' : '#7A4F00';
       const bodyC  = c.type==='good' ? '#1A3A28' : c.type==='warn' ? '#5C1010' : '#4A3000';
-      const icon   = c.type==='good' ? '✅' : c.type==='warn' ? '⚠️' : 'ℹ️';
       html += `<div style="background:${bg};border:2px solid ${border};border-radius:12px;padding:14px 16px;">
-        <div style="font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:${titleC};letter-spacing:0.08em;margin-bottom:6px;">${icon} ${c.title}</div>
+        <div style="font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:${titleC};letter-spacing:0.08em;margin-bottom:6px;">${c.title}</div>
         <div style="font-family:'Crimson Pro',serif;font-size:14px;color:${bodyC};line-height:1.5;">${c.body}</div>
       </div>`;
     });
@@ -1750,7 +1755,7 @@ function generateCallouts(summaries) {
   if (Math.abs(netDiff) > 1) {
     callouts.push({
       type: netDiff > 0 ? 'good' : 'warn',
-      title: netDiff > 0 ? '✅ Net Income Improved' : (last.netIncome < 0 ? '⚠️ Net Loss This Month' : '⚠️ Net Income Declined'),
+      title: netDiff > 0 ? '✅ Net Income Improved' : (last.netIncome < 0 ? '⚠️ NET LOSS This Month' : '📉 Net Income Declined'),
       body: netDiff > 0
         ? `Net income increased by <strong>${fmt(Math.abs(netDiff))}</strong> from ${prevLabel} to ${lastLabel}. Praise God!`
         : (last.netIncome < 0
@@ -2055,7 +2060,7 @@ function renderInsights() {
       </div>
       <div style="text-align:center;padding:12px;background:${netBg};border:${netBorder};border-radius:10px;">
         <div style="font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:rgba(74,28,110,0.5);letter-spacing:0.1em;margin-bottom:4px;">${netLabelTxt}</div>
-        <div style="font-family:'Cinzel',serif;font-size:20px;font-weight:900;color:${netColor};">${fmt(netIncome)}</div>
+        <div style="font-family:'Cinzel',serif;font-size:20px;font-weight:900;color:${netColor};">${netIncome < 0 ? '-' : ''}${fmt(Math.abs(netIncome))}</div>
         <div style="font-family:'Crimson Pro',serif;font-size:11px;font-style:italic;color:rgba(74,28,110,0.5);">${netSubTxt}</div>
       </div>
     </div>
