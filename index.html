@@ -1396,30 +1396,10 @@ const MONTHS = ["January","February","March","April","May","June","July","August
 function storageKey(year, month) { return `budget_v2_${year}_${month}`; }
 function recurringKey() { return 'budget_recurring_v2'; }
 
-function isEffectivelyEmpty(d) {
-  // A month is "effectively empty" if it has no amounts filled in at all
-  const hasAmount = arr => arr.some(r => r.amount && parseFloat(r.amount) > 0);
-  return !hasAmount(d.income) && !hasAmount(d.expenses) && !hasAmount(d.savings);
-}
-
 function getMonthData(year, month) {
   const raw = localStorage.getItem(storageKey(year, month));
-  if (raw) {
-    const saved = JSON.parse(raw);
-    // If saved data is effectively empty (no amounts), check if prev month
-    // has data and offer to carry it over instead
-    if (isEffectivelyEmpty(saved)) {
-      const carried = buildNewMonth(year, month);
-      // Only use carried data if prev month actually had amounts
-      const prevHasData = carried.income.some(r=>parseFloat(r.amount)>0)
-                       || carried.expenses.some(r=>parseFloat(r.amount)>0)
-                       || carried.savings.some(r=>parseFloat(r.amount)>0);
-      if (prevHasData) return carried;
-    }
-    return saved;
-  }
-  // No saved data at all → build from previous month
-  return buildNewMonth(year, month);
+  if (raw) return JSON.parse(raw); // always trust saved data
+  return buildNewMonth(year, month); // only build if truly no data exists
 }
 
 const DEFAULT_EXPENSES = [
