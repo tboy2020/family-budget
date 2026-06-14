@@ -744,6 +744,48 @@
   }
   .empty-state .ei { font-size:28px; display:block; margin-bottom:8px; opacity:0.4; }
 
+
+  /* === EXPORT TAB === */
+  .range-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 8px 14px;
+    border: 1.5px solid rgba(212,160,23,0.3);
+    border-radius: 20px;
+    background: transparent;
+    color: rgba(74,28,110,0.6);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .range-btn.active, .range-btn:hover {
+    background: linear-gradient(135deg, rgba(74,28,110,0.15), rgba(139,26,26,0.1));
+    border-color: var(--gold);
+    color: var(--purple);
+  }
+  .check-label {
+    font-family: 'Crimson Pro', serif;
+    font-size: 13px; color: var(--ink);
+    display: flex; align-items: center; gap: 7px;
+    padding: 6px 10px;
+    background: rgba(212,160,23,0.05);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .check-label input { accent-color: var(--purple-mid); width:14px; height:14px; }
+
+  /* === PDF PRINT STYLES === */
+  @media print {
+    body { background: white !important; }
+    .bg-layer, .bg-pattern, .app-header, .nav-tabs,
+    .month-header, .scripture-bar { display: none !important; }
+    .app-wrapper { max-width: 100%; padding: 0; }
+    #view-monthly, #view-purchases, #view-insights,
+    #view-cumulative, #view-export { display: none !important; }
+    #pdf-preview { display: block !important; }
+    .pdf-back-btn { display: none !important; }
+  }
+
   /* === NAME PROMPT OVERLAY === */
   .name-overlay {
     position: fixed; inset: 0; z-index: 999;
@@ -862,6 +904,7 @@
     <button class="nav-tab"        onclick="showTab('purchases')"  id="tab-purchases">Purchases</button>
     <button class="nav-tab"        onclick="showTab('insights')"   id="tab-insights">Insights</button>
     <button class="nav-tab"        onclick="showTab('cumulative')" id="tab-cumulative">Cumulative</button>
+    <button class="nav-tab"        onclick="showTab('export')"     id="tab-export">Export</button>
   </div>
 
   <!-- MONTH HEADER -->
@@ -1102,6 +1145,109 @@
   <div id="view-cumulative" style="display:none;">
     <div class="cumulative-section" id="cumul-content"></div>
   </div>
+
+  <!-- EXPORT VIEW -->
+  <div id="view-export" style="display:none;">
+    <div style="padding:0 12px 20px;">
+
+      <!-- RANGE SELECTOR -->
+      <div class="insight-card" style="margin-top:4px;">
+        <div class="insight-card-header purple"><span>📤</span> EXPORT BUDGET REPORT</div>
+        <div style="padding:16px;">
+
+          <div class="field-label" style="margin-bottom:8px;">EXPORT RANGE</div>
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+            <button class="range-btn active" id="rbtn-month"  onclick="setExportRange('month')">Single Month</button>
+            <button class="range-btn"        id="rbtn-year"   onclick="setExportRange('year')">Full Year</button>
+            <button class="range-btn"        id="rbtn-custom" onclick="setExportRange('custom')">Custom Range</button>
+          </div>
+
+          <!-- Single Month -->
+          <div id="range-month">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div>
+                <div class="field-label">Month</div>
+                <select class="field-select" id="exp-month">
+                  <option value="0">January</option><option value="1">February</option>
+                  <option value="2">March</option><option value="3">April</option>
+                  <option value="4">May</option><option value="5" selected>June</option>
+                  <option value="6">July</option><option value="7">August</option>
+                  <option value="8">September</option><option value="9">October</option>
+                  <option value="10">November</option><option value="11">December</option>
+                </select>
+              </div>
+              <div>
+                <div class="field-label">Year</div>
+                <select class="field-select" id="exp-year"></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Full Year -->
+          <div id="range-year" style="display:none;">
+            <div>
+              <div class="field-label">Year</div>
+              <select class="field-select" id="exp-year-only"></select>
+            </div>
+          </div>
+
+          <!-- Custom Range -->
+          <div id="range-custom" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div>
+                <div class="field-label">From Month</div>
+                <select class="field-select" id="exp-from-month">
+                  <option value="0">January</option><option value="1">February</option>
+                  <option value="2">March</option><option value="3">April</option>
+                  <option value="4">May</option><option value="5">June</option>
+                  <option value="6">July</option><option value="7">August</option>
+                  <option value="8">September</option><option value="9">October</option>
+                  <option value="10">November</option><option value="11">December</option>
+                </select>
+              </div>
+              <div>
+                <div class="field-label">From Year</div>
+                <select class="field-select" id="exp-from-year"></select>
+              </div>
+              <div>
+                <div class="field-label">To Month</div>
+                <select class="field-select" id="exp-to-month">
+                  <option value="0">January</option><option value="1">February</option>
+                  <option value="2">March</option><option value="3">April</option>
+                  <option value="4">May</option><option value="5" selected>June</option>
+                  <option value="6">July</option><option value="7">August</option>
+                  <option value="8">September</option><option value="9">October</option>
+                  <option value="10">November</option><option value="11">December</option>
+                </select>
+              </div>
+              <div>
+                <div class="field-label">To Year</div>
+                <select class="field-select" id="exp-to-year"></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- INCLUDE SECTIONS -->
+          <div style="margin-top:16px;">
+            <div class="field-label" style="margin-bottom:8px;">INCLUDE SECTIONS</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              <label class="check-label"><input type="checkbox" id="inc-income"    checked> Income</label>
+              <label class="check-label"><input type="checkbox" id="inc-tithe"     checked> Tithe</label>
+              <label class="check-label"><input type="checkbox" id="inc-expenses"  checked> Expenses</label>
+              <label class="check-label"><input type="checkbox" id="inc-purchases" checked> Purchases</label>
+              <label class="check-label"><input type="checkbox" id="inc-savings"   checked> Savings</label>
+              <label class="check-label"><input type="checkbox" id="inc-summary"   checked> Summary</label>
+            </div>
+          </div>
+
+          <button class="submit-btn" style="margin-top:16px;background:linear-gradient(135deg,var(--purple),var(--crimson));" onclick="generateExport()">
+            ✦ GENERATE PDF REPORT
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /view-export -->
 
   <div class="scripture-bar">"For where your treasure is, there your heart will be also." — Matthew 6:21</div>
 
@@ -1389,7 +1535,7 @@ function changeMonth(delta) {
 // TABS
 // =====================================================
 function showTab(tab) {
-  ['monthly','purchases','insights','cumulative'].forEach(t => {
+  ['monthly','purchases','insights','cumulative','export'].forEach(t => {
     document.getElementById('view-'+t).style.display = (t===tab) ? '' : 'none';
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
   });
@@ -1397,6 +1543,7 @@ function showTab(tab) {
   if (tab === 'cumulative') renderCumulative();
   if (tab === 'purchases')  renderPurchases();
   if (tab === 'insights')   renderInsights();
+  if (tab === 'export')     initExport();
 }
 
 // =====================================================
@@ -1911,6 +2058,315 @@ function renderInsights() {
   html += '</div>';
 
   document.getElementById('insights-content').innerHTML = html;
+}
+
+
+// =====================================================
+// EXPORT / PDF
+// =====================================================
+let exportRange = 'month';
+
+function initExportYears() {
+  const allYears = new Set();
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    const m = k.match(/^budget_v2_(\d{4})_/);
+    if (m) allYears.add(parseInt(m[1]));
+  }
+  const years = [...allYears].sort();
+  if (!years.includes(new Date().getFullYear())) years.push(new Date().getFullYear());
+  const curY = new Date().getFullYear();
+
+  ['exp-year','exp-year-only','exp-from-year','exp-to-year'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = years.map(y => `<option value="${y}" ${y===curY?'selected':''}>${y}</option>`).join('');
+  });
+  // Set exp-month to current month
+  document.getElementById('exp-month').value = new Date().getMonth();
+}
+
+function setExportRange(range) {
+  exportRange = range;
+  ['month','year','custom'].forEach(r => {
+    document.getElementById('range-'+r).style.display = r===range ? '' : 'none';
+    document.getElementById('rbtn-'+r).classList.toggle('active', r===range);
+  });
+}
+
+function getExportMonths() {
+  if (exportRange === 'month') {
+    return [{ year: parseInt(document.getElementById('exp-year').value),
+              month: parseInt(document.getElementById('exp-month').value) }];
+  }
+  if (exportRange === 'year') {
+    const y = parseInt(document.getElementById('exp-year-only').value);
+    return Array.from({length:12}, (_,m) => ({year:y, month:m}));
+  }
+  // custom
+  const fy = parseInt(document.getElementById('exp-from-year').value);
+  const fm = parseInt(document.getElementById('exp-from-month').value);
+  const ty = parseInt(document.getElementById('exp-to-year').value);
+  const tm = parseInt(document.getElementById('exp-to-month').value);
+  const result = [];
+  let y = fy, m = fm;
+  while (y < ty || (y === ty && m <= tm)) {
+    result.push({year:y, month:m});
+    m++; if (m > 11) { m = 0; y++; }
+    if (y > ty + 1) break; // safety
+  }
+  return result;
+}
+
+function generateExport() {
+  const months   = getExportMonths();
+  const incInc   = document.getElementById('inc-income').checked;
+  const incTithe = document.getElementById('inc-tithe').checked;
+  const incExp   = document.getElementById('inc-expenses').checked;
+  const incPurch = document.getElementById('inc-purchases').checked;
+  const incSav   = document.getElementById('inc-savings').checked;
+  const incSumm  = document.getElementById('inc-summary').checked;
+  const userName = getUserName() || 'Family';
+
+  // Determine title
+  let rangeLabel = '';
+  if (exportRange === 'month') {
+    const {year,month} = months[0];
+    rangeLabel = `${MONTHS[month]} ${year}`;
+  } else if (exportRange === 'year') {
+    rangeLabel = `Full Year ${months[0].year}`;
+  } else {
+    const f = months[0], t = months[months.length-1];
+    rangeLabel = `${MONTHS[f.month]} ${f.year} – ${MONTHS[t.month]} ${t.year}`;
+  }
+
+  let html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+  <meta charset="UTF-8">
+  <title>${userName}'s Budget Report · ${rangeLabel}</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family: Georgia, serif; background:#fff; color:#1A0A2E; padding:32px; max-width:800px; margin:0 auto; }
+
+    /* BACK BUTTON */
+    .back-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      font-family:Georgia,serif; font-size:13px; font-weight:600;
+      color:#4A1C6E; background:rgba(74,28,110,0.08);
+      border:1.5px solid rgba(74,28,110,0.25); border-radius:20px;
+      padding:8px 18px; cursor:pointer; margin-bottom:24px;
+      text-decoration:none; transition:all 0.2s;
+    }
+    .back-btn:hover { background:rgba(74,28,110,0.15); }
+
+    /* HEADER */
+    .report-header { text-align:center; border-bottom:3px solid #D4A017; padding-bottom:20px; margin-bottom:28px; }
+    .report-crown { font-size:28px; }
+    .report-title { font-size:22px; font-weight:700; color:#4A1C6E; letter-spacing:0.06em; margin:6px 0 2px; }
+    .report-range { font-size:13px; color:#8B6914; font-style:italic; letter-spacing:0.08em; }
+    .report-generated { font-size:11px; color:#aaa; margin-top:4px; }
+
+    /* MONTH BLOCK */
+    .month-block { margin-bottom:36px; page-break-inside:avoid; }
+    .month-title {
+      font-size:16px; font-weight:700; color:#fff;
+      background:linear-gradient(135deg,#4A1C6E,#8B1A1A);
+      padding:10px 16px; border-radius:8px 8px 0 0;
+      letter-spacing:0.08em;
+    }
+
+    /* SECTION */
+    .section { margin-bottom:0; border:1px solid #e8dfc8; border-top:none; }
+    .section:last-child { border-radius:0 0 8px 8px; overflow:hidden; }
+    .section-header {
+      padding:8px 14px;
+      font-size:11px; font-weight:700; letter-spacing:0.1em;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .sh-income  { background:#E8F5EE; color:#1A4A2E; }
+    .sh-tithe   { background:#F0E6FA; color:#4A1C6E; }
+    .sh-expense { background:#FDF0F0; color:#6B1A1A; }
+    .sh-purchase{ background:#E6F0FA; color:#1A3A5E; }
+    .sh-savings { background:#FDF3D0; color:#8B6914; }
+    .sh-summary { background:#1A0A2E; color:#F0C840; }
+
+    table { width:100%; border-collapse:collapse; }
+    td, th { padding:7px 14px; font-size:12px; }
+    th { font-size:10px; font-weight:700; letter-spacing:0.08em; color:#888; border-bottom:1px solid #e8dfc8; text-align:left; }
+    th:last-child, td:last-child { text-align:right; }
+    tr:nth-child(even) td { background:rgba(212,160,23,0.04); }
+    .total-row td { font-weight:700; border-top:2px solid #D4A017; background:rgba(212,160,23,0.08) !important; }
+
+    /* SUMMARY GRID */
+    .summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:#e8dfc8; }
+    .summary-cell { background:#fff; padding:12px 14px; text-align:center; }
+    .summary-cell-label { font-size:9px; font-weight:700; letter-spacing:0.1em; color:#888; display:block; margin-bottom:3px; }
+    .summary-cell-val { font-size:16px; font-weight:700; }
+    .val-green  { color:#1A6B3C; }
+    .val-red    { color:#B22222; }
+    .val-purple { color:#4A1C6E; }
+    .val-gold   { color:#8B6914; }
+
+    /* GRAND TOTAL (multi-month) */
+    .grand-total { background:linear-gradient(135deg,#1A0A2E,#4A1C6E); color:#F0C840; border-radius:8px; padding:16px 20px; margin-top:20px; }
+    .grand-total-title { font-size:12px; font-weight:700; letter-spacing:0.12em; margin-bottom:12px; opacity:0.7; }
+    .grand-total-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .gt-cell { text-align:center; }
+    .gt-label { font-size:9px; opacity:0.6; display:block; margin-bottom:2px; letter-spacing:0.08em; }
+    .gt-val { font-size:15px; font-weight:700; }
+
+    .scripture { text-align:center; font-style:italic; font-size:12px; color:#8B6914; margin-top:28px; padding-top:16px; border-top:1px solid #e8dfc8; }
+
+    @media print {
+      .back-btn { display:none !important; }
+      body { padding:16px; }
+    }
+  </style>
+  </head>
+  <body>
+
+  <a class="back-btn" onclick="window.close()" href="javascript:void(0)">&#8592; Back to Dashboard</a>
+
+  <div class="report-header">
+    <div class="report-crown">✦</div>
+    <div class="report-title">${escHtmlStr(userName.toUpperCase())}'S BUDGET REPORT</div>
+    <div class="report-range">${escHtmlStr(rangeLabel)}</div>
+    <div class="report-generated">Generated ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+  </div>`;
+
+  // Accumulators for grand total
+  let grandIncome=0, grandTithe=0, grandExpenses=0, grandSavings=0, grandPurchases=0;
+
+  months.forEach(({year, month}) => {
+    const d = getMonthData(year, month);
+    const purchases = getPurchases(year, month);
+    const totalIncome  = sumRows(d.income);
+    const tithe        = totalIncome * 0.1;
+    const totalExpense = sumRows(d.expenses);
+    const netIncome    = totalIncome - tithe - totalExpense;
+    const totalSavings = sumRows(d.savings);
+    const totalPurch   = purchases.reduce((s,p)=>s+p.amount,0);
+    const afterSavings = netIncome - totalSavings;
+
+    // Skip completely empty months in multi-month exports
+    if (months.length > 1 && totalIncome === 0 && totalExpense === 0 && totalSavings === 0 && totalPurch === 0) return;
+
+    grandIncome += totalIncome; grandTithe += tithe;
+    grandExpenses += totalExpense; grandSavings += totalSavings; grandPurchases += totalPurch;
+
+    html += `<div class="month-block"><div class="month-title">📅 ${MONTHS[month]} ${year}</div>`;
+
+    // INCOME
+    if (incInc) {
+      html += `<div class="section"><div class="section-header sh-income"><span>💰 INCOME</span><span>${fmt(totalIncome)}</span></div>
+      <table><thead><tr><th>#</th><th>Description</th><th>Amount</th></tr></thead><tbody>`;
+      d.income.filter(r=>r.desc).forEach((r,i) => {
+        html += `<tr><td>${i+1}</td><td>${escHtmlStr(r.desc)}</td><td>$${(parseFloat(r.amount)||0).toFixed(2)}</td></tr>`;
+      });
+      html += `<tr class="total-row"><td colspan="2">Total Income</td><td>${fmt(totalIncome)}</td></tr>`;
+      html += `</tbody></table></div>`;
+    }
+
+    // TITHE
+    if (incTithe) {
+      html += `<div class="section"><div class="section-header sh-tithe"><span>🙏 TITHE (10%)</span><span>${fmt(tithe)}</span></div>
+      <table><tbody><tr><td>First Fruits Offering</td><td>Prov. 3:9</td><td>${fmt(tithe)}</td></tr></tbody></table></div>`;
+    }
+
+    // EXPENSES
+    if (incExp) {
+      html += `<div class="section"><div class="section-header sh-expense"><span>📋 EXPENSES</span><span>${fmt(totalExpense)}</span></div>
+      <table><thead><tr><th>#</th><th>Description</th><th>Amount</th></tr></thead><tbody>`;
+      d.expenses.filter(r=>r.desc).forEach((r,i) => {
+        html += `<tr><td>${i+1}</td><td>${escHtmlStr(r.desc)}</td><td>$${(parseFloat(r.amount)||0).toFixed(2)}</td></tr>`;
+      });
+      html += `<tr class="total-row"><td colspan="2">Total Expenses</td><td>${fmt(totalExpense)}</td></tr>`;
+      html += `</tbody></table></div>`;
+    }
+
+    // PURCHASES
+    if (incPurch && purchases.length) {
+      const storeTots = getStoreTotals(purchases);
+      html += `<div class="section"><div class="section-header sh-purchase"><span>🛒 PURCHASES</span><span>${fmt(totalPurch)}</span></div>
+      <table><thead><tr><th>Store</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead><tbody>`;
+      [...purchases].sort((a,b)=>b.amount-a.amount).forEach(p => {
+        html += `<tr><td>${escHtmlStr(p.store)}</td><td>${escHtmlStr(p.category)}</td><td>${escHtmlStr(p.desc)}</td><td>$${p.amount.toFixed(2)}</td></tr>`;
+      });
+      html += `<tr class="total-row"><td colspan="3">Total Purchases</td><td>${fmt(totalPurch)}</td></tr>`;
+      html += `</tbody></table></div>`;
+    }
+
+    // SAVINGS
+    if (incSav) {
+      html += `<div class="section"><div class="section-header sh-savings"><span>🏦 SAVINGS</span><span>${fmt(totalSavings)}</span></div>
+      <table><thead><tr><th>#</th><th>Goal / Description</th><th>Amount</th></tr></thead><tbody>`;
+      d.savings.filter(r=>r.desc).forEach((r,i) => {
+        html += `<tr><td>${i+1}</td><td>${escHtmlStr(r.desc)}</td><td>$${(parseFloat(r.amount)||0).toFixed(2)}</td></tr>`;
+      });
+      html += `<tr class="total-row"><td colspan="2">Total Savings</td><td>${fmt(totalSavings)}</td></tr>`;
+      html += `</tbody></table></div>`;
+    }
+
+    // SUMMARY
+    if (incSumm) {
+      html += `<div class="section"><div class="section-header sh-summary"><span>⚖️ SUMMARY</span><span>${MONTHS[month]} ${year}</span></div>
+      <div class="summary-grid">
+        <div class="summary-cell"><span class="summary-cell-label">GROSS INCOME</span><span class="summary-cell-val val-green">${fmt(totalIncome)}</span></div>
+        <div class="summary-cell"><span class="summary-cell-label">TITHE</span><span class="summary-cell-val val-purple">${fmt(tithe)}</span></div>
+        <div class="summary-cell"><span class="summary-cell-label">TOTAL EXPENSES</span><span class="summary-cell-val val-red">${fmt(totalExpense)}</span></div>
+        <div class="summary-cell"><span class="summary-cell-label">NET INCOME</span><span class="summary-cell-val ${netIncome>=0?'val-green':'val-red'}">${fmt(netIncome)}</span></div>
+        <div class="summary-cell"><span class="summary-cell-label">SAVINGS</span><span class="summary-cell-val val-gold">${fmt(totalSavings)}</span></div>
+        <div class="summary-cell"><span class="summary-cell-label">AFTER SAVINGS</span><span class="summary-cell-val ${afterSavings>=0?'val-green':'val-red'}">${fmt(afterSavings)}</span></div>
+      </div></div>`;
+    }
+
+    html += `</div>`; // /month-block
+  });
+
+  // GRAND TOTAL (only for multi-month)
+  if (months.length > 1 && incSumm) {
+    const grandNet = grandIncome - grandTithe - grandExpenses;
+    html += `<div class="grand-total">
+      <div class="grand-total-title">✦ GRAND TOTALS · ${escHtmlStr(rangeLabel)}</div>
+      <div class="grand-total-grid">
+        <div class="gt-cell"><span class="gt-label">GROSS INCOME</span><span class="gt-val">${fmt(grandIncome)}</span></div>
+        <div class="gt-cell"><span class="gt-label">TITHE GIVEN</span><span class="gt-val">${fmt(grandTithe)}</span></div>
+        <div class="gt-cell"><span class="gt-label">TOTAL EXPENSES</span><span class="gt-val">${fmt(grandExpenses)}</span></div>
+        <div class="gt-cell"><span class="gt-label">NET INCOME</span><span class="gt-val">${fmt(grandNet)}</span></div>
+        <div class="gt-cell"><span class="gt-label">TOTAL SAVINGS</span><span class="gt-val">${fmt(grandSavings)}</span></div>
+        <div class="gt-cell"><span class="gt-label">PURCHASES</span><span class="gt-val">${fmt(grandPurchases)}</span></div>
+      </div>
+    </div>`;
+  }
+
+  html += `
+  <div class="scripture">"For where your treasure is, there your heart will be also." — Matthew 6:21</div>
+  <script>
+    window.onload = function() {
+      // Auto-trigger print dialog after a short delay
+      setTimeout(() => window.print(), 600);
+    };
+    // Close window after print (back to dashboard)
+    window.onafterprint = function() { window.close(); };
+  <\/script>
+  </body></html>`;
+
+  // Open in new tab
+  const blob = new Blob([html], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (!win) {
+    alert('Please allow pop-ups for this site to open the export. Then tap "Generate PDF Report" again.');
+  }
+}
+
+function escHtmlStr(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function initExport() {
+  initExportYears();
+  setExportRange('month');
 }
 
 // =====================================================
