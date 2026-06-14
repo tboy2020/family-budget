@@ -1658,12 +1658,14 @@ function renderCumulative() {
     html += `<div class="cumul-title">🔔 Callouts & Insights</div>`;
     html += `<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">`;
     callouts.forEach(c=>{
-      const bg = c.type==='good' ? 'rgba(26,107,60,0.08)' : c.type==='warn' ? 'rgba(178,34,34,0.08)' : 'rgba(212,160,23,0.08)';
-      const border = c.type==='good' ? 'rgba(26,107,60,0.3)' : c.type==='warn' ? 'rgba(178,34,34,0.3)' : 'rgba(212,160,23,0.3)';
-      const icon = c.type==='good' ? '✅' : c.type==='warn' ? '⚠️' : 'ℹ️';
-      html += `<div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:12px 14px;">
-        <div style="font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--purple-mid);letter-spacing:0.08em;margin-bottom:4px;">${icon} ${c.title}</div>
-        <div style="font-family:'Crimson Pro',serif;font-size:13px;color:var(--ink);">${c.body}</div>
+      const bg     = c.type==='good' ? '#E8F7EF' : c.type==='warn' ? '#FDF0F0' : '#FDF8E8';
+      const border = c.type==='good' ? '#2D8A5E' : c.type==='warn' ? '#C0392B' : '#C8960C';
+      const titleC = c.type==='good' ? '#1A5C38' : c.type==='warn' ? '#8B1A1A' : '#7A4F00';
+      const bodyC  = c.type==='good' ? '#1A3A28' : c.type==='warn' ? '#5C1010' : '#4A3000';
+      const icon   = c.type==='good' ? '✅' : c.type==='warn' ? '⚠️' : 'ℹ️';
+      html += `<div style="background:${bg};border:2px solid ${border};border-radius:12px;padding:14px 16px;">
+        <div style="font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:${titleC};letter-spacing:0.08em;margin-bottom:6px;">${icon} ${c.title}</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:14px;color:${bodyC};line-height:1.5;">${c.body}</div>
       </div>`;
     });
     html += `</div>`;
