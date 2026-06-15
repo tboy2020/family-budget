@@ -1285,6 +1285,7 @@
               <option>Sam's Club</option>
               <option>Aldi</option>
               <option>Dollar General</option>
+              <option>Gas Station</option>
               <option>Other</option>
             </select>
             <input class="field-input" id="p-store-custom" type="text"
@@ -1502,6 +1503,7 @@
     <div class="store-chip" onclick="pickStore('Costco')">Costco</div>
     <div class="store-chip" onclick="pickStore('SHEIN')">SHEIN</div>
     <div class="store-chip" onclick="pickStore('Temu')">Temu</div>
+    <div class="store-chip" onclick="pickStore('Gas Station')">⛽ Gas</div>
     <div class="store-chip" onclick="pickStore('Other')">Other…</div>
   </div>
 
@@ -2131,17 +2133,19 @@ function resetQuickForm() {
   // Reset chips
   document.querySelectorAll('.store-chip').forEach(c => c.classList.remove('active'));
   selectedStoreChip = '';
+  document.getElementById('qs-store').value = '';
 }
 
 function pickStore(name) {
-  document.getElementById('qs-store').value = name === 'Other…' ? '' : name;
   selectedStoreChip = name;
   document.querySelectorAll('.store-chip').forEach(c => {
-    c.classList.toggle('active', c.textContent === name);
+    c.classList.toggle('active', c.textContent.trim() === name || c.textContent.trim() === '⛽ Gas' && name === 'Gas Station');
   });
   if (name === 'Other') {
     document.getElementById('qs-store').value = '';
     document.getElementById('qs-store').focus();
+  } else {
+    document.getElementById('qs-store').value = name;
   }
 }
 
@@ -2262,14 +2266,17 @@ function parseVoiceInput(text) {
   const lower = text.toLowerCase();
 
   // ── Extract store ──
-  const stores = ['amazon','walmart','kroger','target','costco','shein','temu',"sam's club",'aldi','dollar general'];
+  const stores = ['amazon','walmart','kroger','target','costco','shein','temu',"sam's club",'aldi','dollar general','gas station'];
   let foundStore = '';
   stores.forEach(s => {
-    if (lower.includes(s)) foundStore = s.charAt(0).toUpperCase() + s.slice(1);
+    if (lower.includes(s)) foundStore = s === 'gas station' ? 'Gas Station' : s.charAt(0).toUpperCase() + s.slice(1);
   });
-  if (foundStore) {
+  // Only set store from voice if user hasn't already tapped a chip
+  if (foundStore && !selectedStoreChip) {
     document.getElementById('qs-store').value = foundStore;
     pickStore(foundStore);
+  } else if (!foundStore && !selectedStoreChip) {
+    // No store detected and no chip picked — leave blank for manual entry
   }
 
   // ── Extract amount ──
@@ -2305,7 +2312,8 @@ function parseVoiceInput(text) {
     'health':'Health','medicine':'Health','pharmacy':'Health','vitamin':'Health',
     'entertain':'Entertainment','game':'Entertainment','movie':'Entertainment',
     'educat':'Education','tuition':'Education','book':'Education','course':'Education',
-    'school':'Education','class':'Education','lesson':'Education','training':'Education'
+    'school':'Education','class':'Education','lesson':'Education','training':'Education',
+    'gas':'Fuel & Transportation','fuel':'Fuel & Transportation','petrol':'Fuel & Transportation','station':'Fuel & Transportation'
   };
   let foundCat = '';
   Object.entries(catMap).forEach(([keyword, cat]) => {
