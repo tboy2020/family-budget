@@ -2530,37 +2530,61 @@ function deletePurchase(id) {
 }
 
 function syncPurchasesToExpenses(year, month) {
-  // Only sync if viewing the same month
-  if (year !== currentYear || month !== currentMonth) return;
+  // Works for ANY month — reads & writes that month's stored data directly,
+  // whether or not it is the currently-loaded month.
   const purchases = getPurchases(year, month);
 
   // Sum by category
   const catTotals = {};
   purchases.forEach(p => {
-    catTotals[p.category] = (catTotals[p.category] || 0) + p.amount;
+    catTotals[p.category] = (catTotals[p.category] || 0) + (parseFloat(p.amount) || 0);
   });
 
-  // In expenses, find rows labelled "Purchases: <Category>" and update or add
+  // Load that month's budget data (current in-memory if it's the loaded month,
+  // otherwise read straight from storage)
+  const isLoaded = (year === currentYear && month === currentMonth);
+  let monthData = isLoaded ? data : getMonthData(year, month);
+
+  // Add or update "Purchases: <Category>" rows
   Object.entries(catTotals).forEach(([cat, total]) => {
     const label = `Purchases: ${cat}`;
-    let row = data.expenses.find(r => r.desc === label);
+    let row = monthData.expenses.find(r => r.desc === label);
     if (row) {
       row.amount = total.toFixed(2);
     } else {
-      data.expenses.push({ id: uid(), desc: label, amount: total.toFixed(2) });
+      monthData.expenses.push({ id: uid(), desc: label, amount: total.toFixed(2) });
     }
   });
 
   // Remove purchase rows whose category no longer has purchases
-  data.expenses = data.expenses.filter(r => {
+  monthData.expenses = monthData.expenses.filter(r => {
     if (!r.desc.startsWith('Purchases: ')) return true;
     const cat = r.desc.replace('Purchases: ', '');
     return catTotals[cat] !== undefined;
   });
 
-  saveCurrentMonth();
-  renderRows('expense');
-  updateTotals();
+  // Persist that month
+  if (isLoaded) {
+    saveCurrentMonth();
+    renderRows('expense');
+    updateTotals();
+  } else {
+    saveMonthData(year, month, monthData);
+  }
+}
+
+// Sync EVERY month that has purchases — runs on load for full accuracy
+function syncAllPurchaseMonths() {
+  const months = new Set();
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    const m = k && k.match(/^purchases_v1_(\d{4})_(\d+)$/);
+    if (m) months.add(m[1] + '_' + m[2]);
+  }
+  months.forEach(key => {
+    const [y, mo] = key.split('_').map(Number);
+    syncPurchasesToExpenses(y, mo);
+  });
 }
 
 function getCategoryTotals(purchases) {
@@ -3114,6 +3138,7 @@ function checkAutoAdvance() {
     localStorage.removeItem(recurringKey());
   }
   repairPurchaseMonths();
+  syncAllPurchaseMonths();
   const name = getUserName();
   if (!name) {
     document.getElementById('name-overlay').style.display = 'flex';
