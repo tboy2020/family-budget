@@ -799,6 +799,216 @@
     .pdf-back-btn { display: none !important; }
   }
 
+
+  /* ===================================================
+     FLOATING QUICK-ADD BUTTON + SHEET + VOICE
+  =================================================== */
+
+  /* FAB button */
+  .fab {
+    position: fixed;
+    bottom: 28px; right: 20px;
+    z-index: 900;
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple-mid), var(--crimson-mid));
+    border: none; cursor: pointer;
+    box-shadow: 0 6px 24px rgba(74,28,110,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: var(--gold-light);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fabPulse 3s ease infinite;
+  }
+  .fab:hover  { transform: scale(1.1); box-shadow: 0 8px 32px rgba(74,28,110,0.6); }
+  .fab.open   { transform: rotate(45deg); animation: none; }
+  @keyframes fabPulse {
+    0%,100% { box-shadow: 0 6px 24px rgba(74,28,110,0.5); }
+    50%      { box-shadow: 0 6px 32px rgba(212,160,23,0.5); }
+  }
+
+  /* Backdrop */
+  .fab-backdrop {
+    display: none;
+    position: fixed; inset: 0; z-index: 800;
+    background: rgba(10,4,20,0.6);
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.2s ease;
+  }
+  .fab-backdrop.visible { display: block; }
+
+  /* Bottom sheet */
+  .quick-sheet {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 850;
+    background: var(--parchment);
+    border-radius: 20px 20px 0 0;
+    padding: 0 0 32px;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.34,1.1,0.64,1);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 -8px 40px rgba(74,28,110,0.3);
+  }
+  .quick-sheet.open { transform: translateY(0); }
+
+  /* Sheet handle */
+  .sheet-handle {
+    width: 40px; height: 4px;
+    background: rgba(74,28,110,0.2);
+    border-radius: 10px;
+    margin: 12px auto 0;
+  }
+
+  /* Sheet header */
+  .sheet-header {
+    padding: 14px 18px 12px;
+    background: linear-gradient(135deg, var(--purple), var(--crimson));
+    margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sheet-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--gold-light);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sheet-close {
+    background: none; border: none;
+    color: rgba(240,200,64,0.6); font-size: 22px;
+    cursor: pointer; padding: 0 4px; line-height: 1;
+  }
+
+  /* Voice button */
+  .voice-btn {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(74,28,110,0.08), rgba(139,26,26,0.06));
+    border: 2px dashed rgba(212,160,23,0.4);
+    border-radius: 12px;
+    margin: 0 16px 14px;
+    width: calc(100% - 32px);
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--purple-mid);
+    transition: all 0.2s;
+  }
+  .voice-btn:hover  { background: rgba(74,28,110,0.12); border-color: var(--gold); }
+  .voice-btn.listening {
+    background: rgba(139,26,26,0.1);
+    border-color: var(--crimson-mid);
+    color: var(--crimson-mid);
+    animation: listenPulse 1s ease infinite;
+  }
+  @keyframes listenPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(178,34,34,0.3); }
+    50%      { box-shadow: 0 0 0 8px rgba(178,34,34,0); }
+  }
+  .voice-icon { font-size: 20px; }
+
+  /* Voice transcript display */
+  .voice-transcript {
+    margin: 0 16px 12px;
+    padding: 10px 14px;
+    background: rgba(240,230,250,0.5);
+    border-radius: 10px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px; font-style: italic;
+    color: var(--purple-mid);
+    min-height: 40px;
+    display: none;
+  }
+  .voice-transcript.visible { display: block; }
+
+  /* Sheet form fields */
+  .sheet-fields { padding: 0 16px; }
+  .sheet-field-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 10px;
+  }
+  .sheet-field-row.full { grid-template-columns: 1fr; }
+  .sheet-field-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.1em; color: rgba(74,28,110,0.5);
+    display: block; margin-bottom: 4px;
+  }
+  .sheet-input {
+    width: 100%;
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px; color: var(--ink);
+    padding: 9px 12px;
+    border: 1.5px solid rgba(212,160,23,0.3);
+    border-radius: 10px;
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: auto;
+  }
+  .sheet-input:focus { border-color: var(--purple-mid); }
+  .sheet-input.error { border-color: var(--crimson-mid); }
+
+  /* Store quick-pick chips */
+  .store-chips {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    padding: 0 16px; margin-bottom: 12px;
+  }
+  .store-chip {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 5px 10px; border-radius: 20px;
+    border: 1.5px solid rgba(212,160,23,0.3);
+    background: white; color: var(--purple-mid);
+    cursor: pointer; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .store-chip:hover, .store-chip.active {
+    background: var(--purple-mid); color: white;
+    border-color: var(--purple-mid);
+  }
+
+  /* Submit button */
+  .sheet-submit {
+    width: calc(100% - 32px);
+    margin: 4px 16px 0;
+    padding: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em;
+    background: linear-gradient(135deg, var(--purple), var(--crimson));
+    color: var(--gold-light);
+    border: none; border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(74,28,110,0.35);
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .sheet-submit:hover  { opacity: 0.9; transform: translateY(-1px); }
+  .sheet-submit:active { transform: translateY(0); }
+
+  /* Success toast */
+  .fab-toast {
+    position: fixed;
+    bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+    z-index: 950;
+    background: linear-gradient(135deg, #1A4A2E, #2D6B40);
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 10px 20px; border-radius: 30px;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(26,74,46,0.4);
+  }
+  .fab-toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+
   /* === NAME PROMPT OVERLAY === */
   .name-overlay {
     position: fixed; inset: 0; z-index: 999;
@@ -1262,7 +1472,85 @@
     </div>
   </div><!-- /view-export -->
 
-  <div class="scripture-bar">"For where your treasure is, there your heart will be also." — Matthew 6:21</div>
+  
+<!-- ── FLOATING QUICK-ADD ── -->
+<div class="fab-backdrop" id="fab-backdrop" onclick="closeFAB()"></div>
+
+<button class="fab" id="fab-btn" onclick="toggleFAB()" title="Quick Add Purchase">+</button>
+
+<div class="quick-sheet" id="quick-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">⚡ QUICK ADD PURCHASE</div>
+    <button class="sheet-close" onclick="closeFAB()">×</button>
+  </div>
+
+  <!-- Voice input -->
+  <button class="voice-btn" id="voice-btn" onclick="startVoice()">
+    <span class="voice-icon">🎙️</span>
+    <span id="voice-btn-label">TAP TO SPEAK — e.g. "Amazon, shoes, $47"</span>
+  </button>
+  <div class="voice-transcript" id="voice-transcript"></div>
+
+  <!-- Store quick-pick chips -->
+  <div class="store-chips" id="store-chips">
+    <div class="store-chip" onclick="pickStore('Amazon')">Amazon</div>
+    <div class="store-chip" onclick="pickStore('Walmart')">Walmart</div>
+    <div class="store-chip" onclick="pickStore('Kroger')">Kroger</div>
+    <div class="store-chip" onclick="pickStore('Target')">Target</div>
+    <div class="store-chip" onclick="pickStore('Costco')">Costco</div>
+    <div class="store-chip" onclick="pickStore('SHEIN')">SHEIN</div>
+    <div class="store-chip" onclick="pickStore('Temu')">Temu</div>
+    <div class="store-chip" onclick="pickStore('Other')">Other…</div>
+  </div>
+
+  <div class="sheet-fields">
+    <div class="sheet-field-row">
+      <div>
+        <label class="sheet-field-label">STORE</label>
+        <input class="sheet-input" id="qs-store" type="text" placeholder="e.g. Amazon">
+      </div>
+      <div>
+        <label class="sheet-field-label">AMOUNT ($)</label>
+        <input class="sheet-input" id="qs-amount" type="number" inputmode="decimal" placeholder="0.00">
+      </div>
+    </div>
+    <div class="sheet-field-row">
+      <div>
+        <label class="sheet-field-label">CATEGORY</label>
+        <select class="sheet-input" id="qs-category">
+          <option value="">Select…</option>
+          <option>Groceries</option>
+          <option>Clothing</option>
+          <option>Household</option>
+          <option>Electronics</option>
+          <option>Beauty &amp; Personal Care</option>
+          <option>Food &amp; Dining</option>
+          <option>Kids &amp; Baby</option>
+          <option>Health</option>
+          <option>Entertainment</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="sheet-field-label">DATE</label>
+        <input class="sheet-input" id="qs-date" type="date">
+      </div>
+    </div>
+    <div class="sheet-field-row full">
+      <div>
+        <label class="sheet-field-label">DESCRIPTION</label>
+        <input class="sheet-input" id="qs-desc" type="text" placeholder="What did you buy?">
+      </div>
+    </div>
+  </div>
+
+  <button class="sheet-submit" onclick="submitQuickAdd()">✦ RECORD PURCHASE</button>
+</div>
+
+<div class="fab-toast" id="fab-toast"></div>
+
+<div class="scripture-bar">"For where your treasure is, there your heart will be also." — Matthew 6:21</div>
 
 </div><!-- /app-wrapper -->
 
@@ -1793,6 +2081,228 @@ function generateCallouts(summaries) {
 }
 
 
+
+
+// =====================================================
+// FLOATING QUICK-ADD + VOICE
+// =====================================================
+let fabOpen = false;
+let recognition = null;
+let voiceActive = false;
+let selectedStoreChip = '';
+
+function toggleFAB() {
+  fabOpen ? closeFAB() : openFAB();
+}
+
+function openFAB() {
+  fabOpen = true;
+  document.getElementById('fab-btn').classList.add('open');
+  document.getElementById('fab-backdrop').classList.add('visible');
+  document.getElementById('quick-sheet').classList.add('open');
+  // Set today's date
+  document.getElementById('qs-date').value = new Date().toISOString().slice(0,10);
+  // Focus amount after a beat
+  setTimeout(() => document.getElementById('qs-amount').focus(), 400);
+}
+
+function closeFAB() {
+  fabOpen = false;
+  document.getElementById('fab-btn').classList.remove('open');
+  document.getElementById('fab-backdrop').classList.remove('visible');
+  document.getElementById('quick-sheet').classList.remove('open');
+  stopVoice();
+  resetQuickForm();
+}
+
+function resetQuickForm() {
+  ['qs-store','qs-amount','qs-desc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('error'); }
+  });
+  document.getElementById('qs-category').value = '';
+  document.getElementById('qs-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('voice-transcript').classList.remove('visible');
+  document.getElementById('voice-transcript').textContent = '';
+  document.getElementById('voice-btn-label').textContent = 'TAP TO SPEAK — e.g. "Amazon, shoes, $47"';
+  document.getElementById('voice-btn').classList.remove('listening');
+  // Reset chips
+  document.querySelectorAll('.store-chip').forEach(c => c.classList.remove('active'));
+  selectedStoreChip = '';
+}
+
+function pickStore(name) {
+  document.getElementById('qs-store').value = name === 'Other…' ? '' : name;
+  selectedStoreChip = name;
+  document.querySelectorAll('.store-chip').forEach(c => {
+    c.classList.toggle('active', c.textContent === name);
+  });
+  if (name === 'Other') {
+    document.getElementById('qs-store').value = '';
+    document.getElementById('qs-store').focus();
+  }
+}
+
+function submitQuickAdd() {
+  const store    = (document.getElementById('qs-store').value || '').trim();
+  const amount   = parseFloat(document.getElementById('qs-amount').value) || 0;
+  const category = document.getElementById('qs-category').value;
+  const desc     = (document.getElementById('qs-desc').value || '').trim();
+  const date     = document.getElementById('qs-date').value;
+
+  // Validate
+  let valid = true;
+  [['qs-store', store], ['qs-amount', amount], ['qs-category', category], ['qs-desc', desc]].forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (!val) { el.classList.add('error'); valid = false; }
+    else el.classList.remove('error');
+  });
+  if (!valid) return;
+
+  // Save to purchases for current month/year
+  const y = purchaseYear, m = purchaseMonth;
+  const purchases = getPurchases(y, m);
+  purchases.push({ id: uid(), store, category, desc, amount, date: date || new Date().toISOString().slice(0,10) });
+  savePurchases(y, m, purchases);
+
+  // Sync to expenses if same month as budget
+  syncPurchasesToExpenses(y, m);
+
+  // Refresh purchases view if active
+  if (document.getElementById('view-purchases').style.display !== 'none') renderPurchases();
+
+  // Show toast
+  showFabToast('✅ ' + store + ' · ' + fmt(amount) + ' recorded!');
+  closeFAB();
+}
+
+function showFabToast(msg) {
+  const toast = document.getElementById('fab-toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// ── VOICE INPUT ──────────────────────────────────────
+function startVoice() {
+  if (voiceActive) { stopVoice(); return; }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showFabToast('⚠️ Voice not supported on this browser');
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  voiceActive = true;
+
+  document.getElementById('voice-btn').classList.add('listening');
+  document.getElementById('voice-btn-label').textContent = '🔴 Listening… speak now';
+
+  recognition.onresult = function(e) {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    const transcriptEl = document.getElementById('voice-transcript');
+    transcriptEl.textContent = '"' + transcript + '"';
+    transcriptEl.classList.add('visible');
+
+    // If final result, parse it
+    if (e.results[e.results.length-1].isFinal) {
+      parseVoiceInput(transcript);
+      stopVoice();
+    }
+  };
+
+  recognition.onerror = function(e) {
+    showFabToast('⚠️ Could not hear clearly. Please try again.');
+    stopVoice();
+  };
+
+  recognition.onend = function() {
+    stopVoice();
+  };
+
+  recognition.start();
+}
+
+function stopVoice() {
+  voiceActive = false;
+  if (recognition) { try { recognition.stop(); } catch(e){} recognition = null; }
+  document.getElementById('voice-btn').classList.remove('listening');
+  document.getElementById('voice-btn-label').textContent = 'TAP TO SPEAK — e.g. "Amazon, shoes, $47"';
+}
+
+function parseVoiceInput(text) {
+  // Parse patterns like:
+  // "Amazon, shoes, $47.50"
+  // "Walmart groceries 35 dollars"
+  // "Target clothing forty five"
+  // "Kroger $120 groceries milk and bread"
+
+  const lower = text.toLowerCase();
+
+  // ── Extract store ──
+  const stores = ['amazon','walmart','kroger','target','costco','shein','temu',"sam's club",'aldi','dollar general'];
+  let foundStore = '';
+  stores.forEach(s => {
+    if (lower.includes(s)) foundStore = s.charAt(0).toUpperCase() + s.slice(1);
+  });
+  if (foundStore) {
+    document.getElementById('qs-store').value = foundStore;
+    pickStore(foundStore);
+  }
+
+  // ── Extract amount ──
+  // Match $47, $47.50, "47 dollars", "forty five dollars"
+  const numberWords = {
+    'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,
+    'eight':8,'nine':9,'ten':10,'eleven':11,'twelve':12,'thirteen':13,
+    'fourteen':14,'fifteen':15,'sixteen':16,'seventeen':17,'eighteen':18,
+    'nineteen':19,'twenty':20,'thirty':30,'forty':40,'fifty':50,
+    'sixty':60,'seventy':70,'eighty':80,'ninety':90,'hundred':100
+  };
+  let amount = 0;
+  // Try dollar sign pattern
+  const dollarMatch = text.match(/\$\s*(\d+(?:\.\d{1,2})?)/);
+  if (dollarMatch) {
+    amount = parseFloat(dollarMatch[1]);
+  } else {
+    // Try "NNN dollars" pattern
+    const numMatch = lower.match(/(\d+(?:\.\d{1,2})?)\s*(?:dollars?|bucks?)?/);
+    if (numMatch) amount = parseFloat(numMatch[1]);
+  }
+  if (amount > 0) document.getElementById('qs-amount').value = amount.toFixed(2);
+
+  // ── Extract category ──
+  const catMap = {
+    'grocer':'Groceries','food':'Groceries','milk':'Groceries','bread':'Groceries',
+    'cloth':'Clothing','shirt':'Clothing','shoe':'Clothing','dress':'Clothing','pants':'Clothing',
+    'household':'Household','home':'Household','clean':'Household','kitchen':'Household',
+    'electron':'Electronics','phone':'Electronics','tech':'Electronics','computer':'Electronics',
+    'beauty':'Beauty & Personal Care','makeup':'Beauty & Personal Care','hair':'Beauty & Personal Care',
+    'dining':'Food & Dining','restaur':'Food & Dining','eat':'Food & Dining',
+    'kids':'Kids & Baby','baby':'Kids & Baby','toy':'Kids & Baby','school':'Kids & Baby',
+    'health':'Health','medicine':'Health','pharmacy':'Health','vitamin':'Health',
+    'entertain':'Entertainment','game':'Entertainment','movie':'Entertainment'
+  };
+  let foundCat = '';
+  Object.entries(catMap).forEach(([keyword, cat]) => {
+    if (lower.includes(keyword) && !foundCat) foundCat = cat;
+  });
+  if (foundCat) document.getElementById('qs-category').value = foundCat;
+
+  // ── Extract description (clean up the full text) ──
+  // Remove store name, dollar amounts, category words for cleaner desc
+  let desc = text;
+  if (foundStore) desc = desc.replace(new RegExp(foundStore, 'gi'), '').trim();
+  desc = desc.replace(/\$\s*\d+(?:\.\d{1,2})?/g, '').trim();
+  desc = desc.replace(/\d+\s*dollars?/gi, '').trim();
+  desc = desc.replace(/[,，]/g, ' ').trim();
+  desc = desc.replace(/\s+/g, ' ').trim();
+  if (desc && desc.length > 2) document.getElementById('qs-desc').value = desc;
+}
 
 // =====================================================
 // PURCHASE TRACKER
