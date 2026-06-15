@@ -291,16 +291,14 @@
   .action-col { width: 24px; text-align: center; }
 
   .btn-delete {
-    background: rgba(178,34,34,0.05); border: none;
-    color: rgba(178,34,34,0.45);
-    font-size: 15px; cursor: pointer;
-    padding: 6px 9px;
-    border-radius: 6px;
-    transition: all 0.2s;
+    background: none; border: none;
+    color: rgba(178,34,34,0.25);
+    font-size: 13px; cursor: pointer;
+    padding: 1px;
+    transition: color 0.2s;
     line-height: 1;
   }
-  .btn-delete:hover { color: var(--crimson-mid); background: rgba(178,34,34,0.12); }
-  .action-col { padding-left: 12px !important; border-left: 1px solid rgba(74,28,110,0.07); }
+  .btn-delete:hover { color: var(--crimson-mid); }
 
   .add-row-btn {
     display: flex; align-items: center; gap: 6px;
@@ -524,23 +522,19 @@
   }
 
 
-  /* === DRAG HANDLE === */
-  .drag-col { width: 38px; text-align: center; padding: 0 2px !important; }
-  .btn-drag {
-    background: rgba(107,45,158,0.06); border: none;
-    color: rgba(107,45,158,0.45);
-    font-size: 17px; cursor: grab;
-    padding: 9px 8px; line-height: 1;
-    border-radius: 7px;
-    transition: background 0.15s, color 0.15s;
-    touch-action: none;
-    -webkit-user-select: none; user-select: none;
+  /* === MOVE BUTTONS === */
+  .move-col { width: 20px; text-align: center; padding: 0 1px !important; }
+  .move-btns { display: flex; flex-direction: column; gap: 0; align-items: center; }
+  .btn-move {
+    background: none; border: none;
+    color: rgba(107,45,158,0.25);
+    font-size: 9px; cursor: pointer;
+    padding: 0 2px; line-height: 1.2;
+    transition: color 0.15s;
+    display: block;
   }
-  .btn-drag:hover { color: var(--purple-mid); background: rgba(107,45,158,0.14); }
-  .btn-drag:active { cursor: grabbing; background: rgba(107,45,158,0.2); }
-  tr.dragging { opacity: 0.5; background: rgba(212,160,23,0.12) !important; }
-  tr.drag-over-above { box-shadow: inset 0 3px 0 var(--gold, #D4A017); }
-  tr.drag-over-below { box-shadow: inset 0 -3px 0 var(--gold, #D4A017); }
+  .btn-move:hover { color: var(--purple-mid); }
+  .btn-move:disabled { opacity: 0.08; cursor: default; }
 
   /* === RECURRING TOGGLE === */
   .recurring-wrap {
@@ -1751,10 +1745,11 @@ function renderRows(section) {
           oninput="updateRowField('${key}','${row.id}','amount',this.value);updateTotals()"
           onblur="saveCurrentMonth()">
       </td>
-      <td class="drag-col">
-        <button class="btn-drag" title="Drag to reorder"
-          ontouchstart="dragStart(event,'${key}','${row.id}')"
-          onmousedown="dragStartMouse(event,'${key}','${row.id}')">☰</button>
+      <td class="move-col">
+        <div class="move-btns">
+          <button class="btn-move" onclick="moveRow('${key}','${row.id}',-1)" title="Move up" ${i===0?'disabled':''}>▲</button>
+          <button class="btn-move" onclick="moveRow('${key}','${row.id}',1)" title="Move down" ${i===rows.length-1?'disabled':''}>▼</button>
+        </div>
       </td>
       <td class="action-col">
         <button class="btn-delete" onclick="deleteRow('${key}','${row.id}')" title="Remove">×</button>
@@ -1815,81 +1810,6 @@ function moveRow(key, id, dir) {
   saveCurrentMonth();
 }
 
-// =====================================================
-// DRAG-TO-REORDER (touch + mouse) with drag handle
-// =====================================================
-let dragState = null;
-
-function dragStart(e, key, id) {
-  e.preventDefault();
-  const tr = e.target.closest('tr');
-  if (!tr) return;
-  beginDrag(key, id, tr);
-  document.addEventListener('touchmove', dragMove, { passive: false });
-  document.addEventListener('touchend', dragEnd);
-}
-function dragStartMouse(e, key, id) {
-  e.preventDefault();
-  const tr = e.target.closest('tr');
-  if (!tr) return;
-  beginDrag(key, id, tr);
-  document.addEventListener('mousemove', dragMoveMouse);
-  document.addEventListener('mouseup', dragEnd);
-}
-function beginDrag(key, id, tr) {
-  dragState = { key, id, tr, tbody: tr.parentElement, overId: null, overPos: null };
-  tr.classList.add('dragging');
-}
-function pointFromEvent(e) {
-  if (e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  return { x: e.clientX, y: e.clientY };
-}
-function dragMove(e) { e.preventDefault(); doDragOver(e); }
-function dragMoveMouse(e) { doDragOver(e); }
-function doDragOver(e) {
-  if (!dragState) return;
-  const { y } = pointFromEvent(e);
-  const rows = [...dragState.tbody.querySelectorAll('tr')];
-  // clear markers
-  rows.forEach(r => r.classList.remove('drag-over-above', 'drag-over-below'));
-  let target = null, pos = null;
-  for (const r of rows) {
-    if (r === dragState.tr) continue;
-    const rect = r.getBoundingClientRect();
-    if (y >= rect.top && y <= rect.bottom) {
-      const mid = rect.top + rect.height / 2;
-      if (y < mid) { r.classList.add('drag-over-above'); pos = 'above'; }
-      else { r.classList.add('drag-over-below'); pos = 'below'; }
-      target = r;
-      break;
-    }
-  }
-  dragState.overId = target ? target.getAttribute('data-id') : null;
-  dragState.overPos = pos;
-}
-function dragEnd() {
-  document.removeEventListener('touchmove', dragMove);
-  document.removeEventListener('touchend', dragEnd);
-  document.removeEventListener('mousemove', dragMoveMouse);
-  document.removeEventListener('mouseup', dragEnd);
-  if (!dragState) return;
-  const { key, id, overId, overPos, tbody } = dragState;
-  tbody.querySelectorAll('tr').forEach(r => r.classList.remove('dragging','drag-over-above','drag-over-below'));
-  if (overId && overId !== id) {
-    const arr = data[key];
-    const from = arr.findIndex(r => r.id === id);
-    const moved = arr.splice(from, 1)[0];
-    let to = arr.findIndex(r => r.id === overId);
-    if (overPos === 'below') to += 1;
-    arr.splice(to, 0, moved);
-    const section = key === 'expenses' ? 'expense' : key;
-    renderRows(section);
-    saveCurrentMonth();
-  }
-  dragState = null;
-}
-
-
 function addRow(section) {
   const key = section === 'expense' ? 'expenses' : section;
   data[key].push(emptyRow());
@@ -1904,11 +1824,6 @@ function addRow(section) {
 }
 
 function deleteRow(key, id) {
-  // Find the row so we can show its description in the confirmation
-  const row = (data[key]||[]).find(r=>r.id===id);
-  const label = row && (row.desc||'').trim() ? `"${row.desc.trim()}"` : 'this line';
-  const amt = row && row.amount ? ` (${fmt(parseFloat(row.amount)||0)})` : '';
-  if (!confirm(`Delete ${label}${amt}?\n\nThis cannot be undone.`)) return;
   const section = key === 'expenses' ? 'expense' : key;
   if (data[key].length === 1) { data[key] = [emptyRow()]; }
   else { data[key] = data[key].filter(r=>r.id!==id); }
