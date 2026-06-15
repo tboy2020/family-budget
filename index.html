@@ -1305,6 +1305,7 @@
               <option>Kids &amp; Baby</option>
               <option>Health</option>
               <option>Entertainment</option>
+              <option>Education</option>
               <option>Other</option>
             </select>
           </div>
@@ -1529,6 +1530,7 @@
           <option>Kids &amp; Baby</option>
           <option>Health</option>
           <option>Entertainment</option>
+          <option>Education</option>
           <option>Other</option>
         </select>
       </div>
@@ -2195,24 +2197,27 @@ function startVoice() {
 
   recognition = new SpeechRecognition();
   recognition.lang = 'en-US';
-  recognition.continuous = false;
+  recognition.continuous = true;
   recognition.interimResults = true;
   voiceActive = true;
 
   document.getElementById('voice-btn').classList.add('listening');
-  document.getElementById('voice-btn-label').textContent = '🔴 Listening… speak now';
+  document.getElementById('voice-btn-label').textContent = '🔴 Listening… tap again when done';
 
   recognition.onresult = function(e) {
-    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
-    const transcriptEl = document.getElementById('voice-transcript');
-    transcriptEl.textContent = '"' + transcript + '"';
-    transcriptEl.classList.add('visible');
-
-    // If final result, parse it
-    if (e.results[e.results.length-1].isFinal) {
-      parseVoiceInput(transcript);
-      stopVoice();
+    // Show all results (interim + final) as running transcript
+    let interim = '';
+    let finalText = '';
+    for (let i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalText += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
     }
+    const combined = (finalText + interim).trim();
+    const transcriptEl = document.getElementById('voice-transcript');
+    transcriptEl.textContent = '"' + combined + '"';
+    transcriptEl.classList.add('visible');
+    // Store latest full transcript for when user taps stop
+    recognition._latestTranscript = combined;
   };
 
   recognition.onerror = function(e) {
@@ -2221,17 +2226,30 @@ function startVoice() {
   };
 
   recognition.onend = function() {
-    stopVoice();
+    // If still active (unexpected end), restart to keep listening
+    if (voiceActive && recognition) {
+      try { recognition.start(); } catch(e) { stopVoice(); }
+    }
   };
 
   recognition.start();
 }
 
 function stopVoice() {
+  const wasActive = voiceActive;
   voiceActive = false;
-  if (recognition) { try { recognition.stop(); } catch(e){} recognition = null; }
+  let lastTranscript = '';
+  if (recognition) {
+    lastTranscript = recognition._latestTranscript || '';
+    try { recognition.stop(); } catch(e){}
+    recognition = null;
+  }
   document.getElementById('voice-btn').classList.remove('listening');
-  document.getElementById('voice-btn-label').textContent = 'TAP TO SPEAK — e.g. "Amazon, shoes, $47"';
+  document.getElementById('voice-btn-label').textContent = 'TAP TO SPEAK — e.g. "Amazon, shoes, $47 yesterday"';
+  // Parse whatever was captured when user tapped stop
+  if (wasActive && lastTranscript) {
+    parseVoiceInput(lastTranscript);
+  }
 }
 
 function parseVoiceInput(text) {
@@ -2285,13 +2303,15 @@ function parseVoiceInput(text) {
     'dining':'Food & Dining','restaur':'Food & Dining','eat':'Food & Dining',
     'kids':'Kids & Baby','baby':'Kids & Baby','toy':'Kids & Baby','school':'Kids & Baby',
     'health':'Health','medicine':'Health','pharmacy':'Health','vitamin':'Health',
-    'entertain':'Entertainment','game':'Entertainment','movie':'Entertainment'
+    'entertain':'Entertainment','game':'Entertainment','movie':'Entertainment',
+    'educat':'Education','tuition':'Education','book':'Education','course':'Education',
+    'school':'Education','class':'Education','lesson':'Education','training':'Education'
   };
   let foundCat = '';
   Object.entries(catMap).forEach(([keyword, cat]) => {
     if (lower.includes(keyword) && !foundCat) foundCat = cat;
   });
-  if (foundCat) document.getElementById('qs-category').value = foundCat;
+  document.getElementById('qs-category').value = foundCat || 'Other';
 
   // ── Extract date ──
   const today = new Date();
@@ -2355,8 +2375,12 @@ function parseVoiceInput(text) {
   desc = desc.replace(/\b(last|this)\s*(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/gi, '').trim();
   desc = desc.replace(/\b\d+\s*days?\s*ago\b/gi, '').trim();
   desc = desc.replace(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?\b/gi, '').trim();
+  // Clean month+day patterns like "June 8", "June 8th", "8th of June"
+  desc = desc.replace(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?\b/gi, '');
+  desc = desc.replace(/\b\d{1,2}(?:st|nd|rd|th)?\s+(?:of\s+)?(?:january|february|march|april|may|june|july|august|september|october|november|december)\b/gi, '');
   desc = desc.replace(/[,]/g, ' ').replace(/\s+/g, ' ').trim();
   if (desc && desc.length > 2) document.getElementById('qs-desc').value = desc;
+  else document.getElementById('qs-desc').value = '';
 }
 
 
