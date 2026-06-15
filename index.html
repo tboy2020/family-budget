@@ -2087,6 +2087,57 @@ function generateCallouts(summaries) {
 
 
 
+
+// =====================================================
+// ONE-TIME REPAIR: relocate purchases filed in wrong month
+// =====================================================
+function repairPurchaseMonths() {
+  if (localStorage.getItem('purchases_repaired_v1')) return;
+  const allKeys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('purchases_v1_')) allKeys.push(k);
+  }
+  // Gather all purchases with their correct target month
+  const moves = {}; // targetKey -> array of purchases
+  const keep  = {}; // sourceKey -> array of purchases that stay
+  allKeys.forEach(key => {
+    const m = key.match(/^purchases_v1_(\d{4})_(\d+)$/);
+    if (!m) return;
+    const srcYear = parseInt(m[1]), srcMonth = parseInt(m[2]);
+    let arr = [];
+    try { arr = JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return; }
+    arr.forEach(p => {
+      if (!p.date) { (keep[key] = keep[key]||[]).push(p); return; }
+      const d = new Date(p.date + 'T00:00:00');
+      const tY = d.getFullYear(), tM = d.getMonth();
+      if (tY === srcYear && tM === srcMonth) {
+        (keep[key] = keep[key]||[]).push(p); // already correct
+      } else {
+        const tKey = `purchases_v1_${tY}_${tM}`;
+        (moves[tKey] = moves[tKey]||[]).push(p); // needs to move
+      }
+    });
+  });
+  // Write back the "keep" arrays
+  Object.keys(keep).forEach(key => {
+    localStorage.setItem(key, JSON.stringify(keep[key]));
+  });
+  // Clear any source keys that had everything moved out
+  allKeys.forEach(key => { if (!keep[key]) localStorage.setItem(key, JSON.stringify([])); });
+  // Merge moved purchases into their correct months
+  Object.keys(moves).forEach(tKey => {
+    let existing = [];
+    try { existing = JSON.parse(localStorage.getItem(tKey)) || []; } catch(e){}
+    const merged = existing.concat(moves[tKey]);
+    // de-dup by id
+    const seen = {}; const final = [];
+    merged.forEach(p => { if (!seen[p.id]) { seen[p.id]=1; final.push(p); } });
+    localStorage.setItem(tKey, JSON.stringify(final));
+  });
+  localStorage.setItem('purchases_repaired_v1', '1');
+}
+
 // =====================================================
 // FLOATING QUICK-ADD + VOICE
 // =====================================================
@@ -2165,13 +2216,15 @@ function submitQuickAdd() {
   });
   if (!valid) return;
 
-  // Save to purchases for current month/year
-  const y = purchaseYear, m = purchaseMonth;
+  // File under the month/year of the actual purchase DATE
+  const finalDate = date || new Date().toISOString().slice(0,10);
+  const dObj = new Date(finalDate + 'T00:00:00');
+  const y = dObj.getFullYear(), m = dObj.getMonth();
   const purchases = getPurchases(y, m);
-  purchases.push({ id: uid(), store, category, desc, amount, date: date || new Date().toISOString().slice(0,10) });
+  purchases.push({ id: uid(), store, category, desc, amount, date: finalDate });
   savePurchases(y, m, purchases);
 
-  // Sync to expenses if same month as budget
+  // Sync to expenses for that month
   syncPurchasesToExpenses(y, m);
 
   // Refresh purchases view if active
@@ -2446,9 +2499,16 @@ function addPurchase() {
     return;
   }
 
-  const purchases = getPurchases(purchaseYear, purchaseMonth);
-  purchases.push({ id: uid(), store, category, desc, amount, date: date || new Date().toISOString().slice(0,10) });
-  savePurchases(purchaseYear, purchaseMonth, purchases);
+  const finalDate = date || new Date().toISOString().slice(0,10);
+  // File the purchase under the month/year of its actual DATE, not the viewed month
+  const dObj = new Date(finalDate + 'T00:00:00');
+  const fileYear = dObj.getFullYear();
+  const fileMonth = dObj.getMonth();
+  const purchases = getPurchases(fileYear, fileMonth);
+  purchases.push({ id: uid(), store, category, desc, amount, date: finalDate });
+  savePurchases(fileYear, fileMonth, purchases);
+  // Sync the month this purchase belongs to
+  syncPurchasesToExpenses(fileYear, fileMonth);
 
   // Reset form
   document.getElementById('p-store').value = '';
@@ -2460,7 +2520,6 @@ function addPurchase() {
   ['p-store','p-category','p-desc','p-amount'].forEach(id => document.getElementById(id).style.borderColor='');
 
   renderPurchases();
-  syncPurchasesToExpenses(purchaseYear, purchaseMonth);
 }
 
 function deletePurchase(id) {
@@ -3054,6 +3113,7 @@ function checkAutoAdvance() {
   if (!hasAnyData) {
     localStorage.removeItem(recurringKey());
   }
+  repairPurchaseMonths();
   const name = getUserName();
   if (!name) {
     document.getElementById('name-overlay').style.display = 'flex';
