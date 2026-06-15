@@ -3067,7 +3067,44 @@ function checkAutoAdvance() {
   document.getElementById('p-date').value = todayStr;
   // Sync any existing purchases for current month into expenses
   syncPurchasesToExpenses(currentYear, currentMonth);
+
+  // ── Handle bookmarklet launch from Amazon ──────────────────────────────
+  checkBookmarkletParams();
 })();
+
+function checkBookmarkletParams() {
+  const params = new URLSearchParams(window.location.search);
+  const hash   = window.location.hash;
+  if (!params.get('source') || params.get('source') !== 'bookmarklet') return;
+
+  const store    = params.get('store')    || 'Amazon';
+  const amount   = params.get('amount')  || '';
+  const desc     = params.get('desc')    || '';
+  const date     = params.get('date')    || new Date().toISOString().slice(0,10);
+  const category = params.get('category')|| '';
+
+  // Open the quick-add sheet with pre-filled values
+  setTimeout(() => {
+    openFAB();
+    // Pre-fill fields
+    document.getElementById('qs-store').value    = store;
+    document.getElementById('qs-amount').value   = amount;
+    document.getElementById('qs-desc').value     = desc;
+    document.getElementById('qs-date').value     = date;
+    if (category) document.getElementById('qs-category').value = category;
+
+    // Highlight the matching store chip
+    document.querySelectorAll('.store-chip').forEach(c => {
+      if (c.textContent.trim() === store) c.classList.add('active');
+    });
+
+    // Show a toast so user knows it came from Amazon
+    showFabToast('🛒 Amazon order loaded — check & confirm!');
+
+    // Clean URL so params don't persist on refresh
+    history.replaceState({}, '', window.location.pathname);
+  }, 600);
+}
 </script>
 </body>
 </html>
