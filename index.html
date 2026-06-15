@@ -522,19 +522,23 @@
   }
 
 
-  /* === MOVE BUTTONS === */
-  .move-col { width: 20px; text-align: center; padding: 0 1px !important; }
-  .move-btns { display: flex; flex-direction: column; gap: 0; align-items: center; }
-  .btn-move {
-    background: none; border: none;
-    color: rgba(107,45,158,0.25);
-    font-size: 9px; cursor: pointer;
-    padding: 0 2px; line-height: 1.2;
-    transition: color 0.15s;
-    display: block;
+  /* === DRAG HANDLE === */
+  .drag-col { width: 40px; text-align: center; padding: 0 2px !important; }
+  .btn-drag {
+    background: rgba(107,45,158,0.07); border: none;
+    color: rgba(107,45,158,0.5);
+    font-size: 18px; cursor: grab;
+    padding: 10px 9px; line-height: 1;
+    border-radius: 7px;
+    touch-action: none;
+    -webkit-user-select: none; user-select: none;
+    transition: background 0.15s;
   }
-  .btn-move:hover { color: var(--purple-mid); }
-  .btn-move:disabled { opacity: 0.08; cursor: default; }
+  .btn-drag:active { cursor: grabbing; background: rgba(107,45,158,0.22); }
+  tr.dragging { opacity: 0.45; background: rgba(212,160,23,0.14) !important; }
+  tr.drop-above { box-shadow: inset 0 3px 0 #D4A017; }
+  tr.drop-below { box-shadow: inset 0 -3px 0 #D4A017; }
+  .action-col { padding-left: 10px !important; border-left: 1px solid rgba(74,28,110,0.08); }
 
   /* === RECURRING TOGGLE === */
   .recurring-wrap {
@@ -1745,14 +1749,12 @@ function renderRows(section) {
           oninput="updateRowField('${key}','${row.id}','amount',this.value);updateTotals()"
           onblur="saveCurrentMonth()">
       </td>
-      <td class="move-col">
-        <div class="move-btns">
-          <button class="btn-move" onclick="moveRow('${key}','${row.id}',-1)" title="Move up" ${i===0?'disabled':''}>▲</button>
-          <button class="btn-move" onclick="moveRow('${key}','${row.id}',1)" title="Move down" ${i===rows.length-1?'disabled':''}>▼</button>
-        </div>
+      <td class="drag-col">
+        <button type="button" class="btn-drag" title="Drag to reorder"
+          ontouchstart="dragTouchStart(event,'${key}','${row.id}')">☰</button>
       </td>
       <td class="action-col">
-        <button class="btn-delete" onclick="deleteRow('${key}','${row.id}')" title="Remove">×</button>
+        <button type="button" class="btn-delete" onclick="deleteRow('${key}','${row.id}')" title="Remove">×</button>
       </td>
     </tr>
   `).join('');
@@ -1810,6 +1812,66 @@ function moveRow(key, id, dir) {
   saveCurrentMonth();
 }
 
+// =====================================================
+// DRAG-TO-REORDER (touch) — safe, self-contained
+// =====================================================
+var _drag = null;
+function dragTouchStart(e, key, id) {
+  if (!e.touches || !e.touches.length) return;
+  e.preventDefault();
+  var tr = e.target.closest('tr');
+  if (!tr) return;
+  var tbody = tr.parentElement;
+  _drag = { key: key, id: id, tr: tr, tbody: tbody, overId: null, pos: null };
+  tr.classList.add('dragging');
+  document.addEventListener('touchmove', dragTouchMove, { passive: false });
+  document.addEventListener('touchend', dragTouchEnd);
+  document.addEventListener('touchcancel', dragTouchEnd);
+}
+function dragTouchMove(e) {
+  if (!_drag) return;
+  e.preventDefault();
+  var y = e.touches[0].clientY;
+  var rows = Array.prototype.slice.call(_drag.tbody.querySelectorAll('tr'));
+  rows.forEach(function(r){ r.classList.remove('drop-above','drop-below'); });
+  _drag.overId = null; _drag.pos = null;
+  for (var i=0;i<rows.length;i++){
+    var r = rows[i];
+    if (r === _drag.tr) continue;
+    var rect = r.getBoundingClientRect();
+    if (y >= rect.top && y <= rect.bottom) {
+      var mid = rect.top + rect.height/2;
+      if (y < mid){ r.classList.add('drop-above'); _drag.pos='above'; }
+      else { r.classList.add('drop-below'); _drag.pos='below'; }
+      _drag.overId = r.getAttribute('data-id');
+      break;
+    }
+  }
+}
+function dragTouchEnd() {
+  document.removeEventListener('touchmove', dragTouchMove);
+  document.removeEventListener('touchend', dragTouchEnd);
+  document.removeEventListener('touchcancel', dragTouchEnd);
+  if (!_drag) return;
+  var d = _drag; _drag = null;
+  var rows = Array.prototype.slice.call(d.tbody.querySelectorAll('tr'));
+  rows.forEach(function(r){ r.classList.remove('dragging','drop-above','drop-below'); });
+  if (d.overId && d.overId !== d.id) {
+    var arr = data[d.key];
+    if (!Array.isArray(arr)) return;
+    var from = arr.findIndex(function(r){ return r.id === d.id; });
+    if (from < 0) return;
+    var moved = arr.splice(from, 1)[0];
+    var to = arr.findIndex(function(r){ return r.id === d.overId; });
+    if (to < 0) { arr.splice(from, 0, moved); return; }
+    if (d.pos === 'below') to += 1;
+    arr.splice(to, 0, moved);
+    var section = d.key === 'expenses' ? 'expense' : d.key;
+    renderRows(section);
+    saveCurrentMonth();
+  }
+}
+
 function addRow(section) {
   const key = section === 'expense' ? 'expenses' : section;
   data[key].push(emptyRow());
@@ -1824,6 +1886,10 @@ function addRow(section) {
 }
 
 function deleteRow(key, id) {
+  const row = (data[key]||[]).find(r=>r.id===id);
+  const label = row && (row.desc||'').trim() ? '"'+row.desc.trim()+'"' : 'this line';
+  const amt = row && row.amount ? ' ('+fmt(parseFloat(row.amount)||0)+')' : '';
+  if (!confirm('Delete '+label+amt+'?\n\nThis cannot be undone.')) return;
   const section = key === 'expenses' ? 'expense' : key;
   if (data[key].length === 1) { data[key] = [emptyRow()]; }
   else { data[key] = data[key].filter(r=>r.id!==id); }
@@ -2544,6 +2610,11 @@ function syncPurchasesToExpenses(year, month) {
   // otherwise read straight from storage)
   const isLoaded = (year === currentYear && month === currentMonth);
   let monthData = isLoaded ? data : getMonthData(year, month);
+  // Safety: ensure arrays always exist so we never crash on .filter/.push
+  if (!monthData) monthData = { income:[], expenses:[], savings:[] };
+  if (!Array.isArray(monthData.income)) monthData.income = [];
+  if (!Array.isArray(monthData.expenses)) monthData.expenses = [];
+  if (!Array.isArray(monthData.savings)) monthData.savings = [];
 
   // Add or update "Purchases: <Category>" rows
   Object.entries(catTotals).forEach(([cat, total]) => {
